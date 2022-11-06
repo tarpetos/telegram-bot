@@ -52,6 +52,3 @@ def change_font_size(mem_image):
         return 60
     else:
         return 90
-
-
-create_meme()
