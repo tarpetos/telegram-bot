@@ -1,5 +1,3 @@
-import sys
-import locale
 from PIL import Image, ImageFont, ImageDraw
 import extract_random_data
 
@@ -42,25 +40,7 @@ def change_font_place(mem_image, image_editable, title_text):
     temp_str = replace_string(title_text)
     text_width, text_height = image_editable.textsize(temp_str)
 
-    print('Text length:', len(temp_str))
-    print('Text width:', text_width)
-    print('Text height:', text_height)
-    print('Photo width:', photo_width)
-    print('Photo height:', photo_height)
-
     return ((photo_width / 2) - (text_width * 2.25)), ((photo_height - text_height) / 1.25)
-    # if len(temp_str) <= 5:
-    #     return ((photo_width - text_width) / 2), ((photo_height - text_height) / 1.25)
-    # elif len(temp_str) <= 10:
-    #     return ((photo_width - text_width) / 3), ((photo_height - text_height) / 1.25)
-    # elif len(temp_str) > 10:
-    #     return ((photo_width - text_width) / 3), ((photo_height - text_height) / 1.25)
-    # elif len(temp_str) > 20:
-    #     return ((photo_width - text_width) / 4), ((photo_height - text_height) / 1.25)
-    # elif len(temp_str) > 30:
-    #     return ((photo_width - text_width) / 5), ((photo_height - text_height) / 1.25)
-    # else:
-    #     return ((photo_width - text_width) / 6), ((photo_height - text_height) / 1.25)
 
 
 def change_font_size(mem_image):

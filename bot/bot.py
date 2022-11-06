@@ -46,17 +46,6 @@ async def send_welcome(message: types.Message):
 async def mark_eugene(message: types.Message):
     await message.reply('Команда "eugene" тимчасово не працює.🤷‍')
 
-    # try:
-    #     while True:
-    #         await bot.send_message(message.from_user.id, '@ost_adm')
-    #         time.sleep(1)
-    # except exceptions.RetryAfter:
-    #     start = time.perf_counter()
-    #     time.sleep(10)
-    #     end = time.perf_counter()
-    #     print('Waiting', round(end - start), 'seconds')
-    #     await mark_eugene(message)
-
 
 @dp.message_handler(commands=['id'])
 async def alarm(message: types.Message):
