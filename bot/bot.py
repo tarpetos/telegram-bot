@@ -4,7 +4,6 @@ import extract_random_data
 import create_meme
 
 from aiogram.types import InputFile
-from aiogram.utils import exceptions
 from config import API_TOKEN
 from datetime import date
 from datetime import datetime
@@ -122,98 +121,6 @@ async def create_mem(message: types.Message):
     create_meme.create_meme()
     photo = InputFile("img/result.jpg")
     await bot.send_photo(message.chat.id, photo=photo)
-
-
-# @dp.message_handler(regexp='photo')
-# async def send_image(message: types.Message):
-#     photo = InputFile("img/test.jpg")
-#     await bot.send_photo(message.chat.id, photo=photo)
-
-
-# @dp.message_handler(regexp='шо робите|вставайте|ну шо там')
-# async def call_sofi(message: types.Message):
-#     # Софі
-#     user_sofi_id = 639092726
-#     user_sofi_name = 'СОФІ'
-#     mention_sofi = '[' + user_sofi_name + '](tg://user?id=' + str(user_sofi_id) + ')'
-#
-#     # Тарпетос
-#     user_tarpetos_id = 441547155
-#     user_tarpetos_name = 'ТАРАС'
-#     mention_tarpetos = '[' + user_tarpetos_name + '](tg://user?id=' + str(user_tarpetos_id) + ')'
-#
-#     # Гігос
-#     user_gigos_id = 420823189
-#     user_gigos_name = 'МИРИК'
-#     mention_gigos = '[' + user_gigos_name + '](tg://user?id=' + str(user_gigos_id) + ')'
-#
-#     # Євген @ost_adm
-#     user_eugene_id = '@ost_adm'
-#     user_eugene_name = 'ЖЕНЯ'
-#     mention_eugene = '[' + user_eugene_name + '](tg://user?id=' + str(user_eugene_id) + ')'
-#
-#     # Влад
-#     user_vlad_id = 922145120
-#     user_vlad_name = 'ВЛАД'
-#     mention_vlad = '[' + user_vlad_name + '](tg://user?id=' + str(user_vlad_id) + ')'
-#
-#     # Корнєй
-#     user_korn_id = 867324388
-#     user_korn_name = 'КОРНЄЙ'
-#     mention_korn = '[' + user_korn_name + '](tg://user?id=' + str(user_korn_id) + ')'
-#
-#     # Кошик @kosh1kkk
-#     user_artem_id = 891849290
-#     user_artem_name = 'КОШИК'
-#     mention_artem = '[' + user_artem_name + '](tg://user?id=' + str(user_artem_id) + ')'
-#
-#     # Даня @dan1sssimo
-#     user_danya_id = 685244760
-#     user_danya_name = 'ДАНЯ'
-#     mention_danya = '[' + user_danya_name + '](tg://user?id=' + str(user_danya_id) + ')'
-#
-#     # Діма
-#     user_dima_id = 661245516
-#     user_dima_name = 'ДІМА'
-#     mention_dima = '[' + user_dima_name + '](tg://user?id=' + str(user_dima_id) + ')'
-#
-#     # Аня @anafaryniuk
-#     user_ann_id = 111111
-#     user_ann_name = 'АНЯ'
-#     mention_ann = '[' + user_ann_name + '](tg://user?id=' + str(user_ann_id) + ')'
-#
-#     # Ярик
-#     user_yar_id = 881067050
-#     user_yar_name = 'ЯРИК'
-#     mention_yar = '[' + user_yar_name + '](tg://user?id=' + str(user_yar_id) + ')'
-#
-#     # bot_msg = f'АААААААААААААА СУКААААААА, ' \
-#     #           f'{mention_tarpetos}, ' \
-#     #           f'{mention_gigos}, ' \
-#     #           f'{mention_vlad}, ' \
-#     #           f'{mention_yar}, ' \
-#     #           f'{mention_danya}, ' \
-#     #           f'{mention_sofi}, ' \
-#     #           f'{mention_dima}, ' \
-#     #           f'{mention_ann}, ' \
-#     #           f'{mention_eugene}, ' \
-#     #           f'{mention_artem}, ' \
-#     #           f'{mention_korn}!!! '
-#
-#     # bot_msg = f'АААААААААААААА СУКААААААА, {mention_tarpetos}, @anafaryniuk'
-#
-#     bot_msg = f'{mention_tarpetos}, ' \
-#               f'{mention_gigos}, ' \
-#               f'{mention_vlad}, ' \
-#               f'{mention_dima}, ' \
-#               f'{mention_sofi}, ' \
-#               f'{mention_korn},' \
-#               f'{mention_artem}, ' \
-#               f'{mention_yar} (да, я знаю, шо це згадування не робить)'
-#
-#     await bot.send_message(message.chat.id, 'ААААААААААААААААААААААААААА', parse_mode='Markdown')
-#     await bot.send_message(message.chat.id, bot_msg, parse_mode='Markdown')
-#     await bot.send_message(message.chat.id, '@dan1sssimo, @anafaryniuk, @ost_adm')
 
 
 @dp.message_handler(regexp='martyn|мартин')
