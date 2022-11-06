@@ -1,0 +1,7 @@
+.idea/
+venv/
+spamer/
+fonts/
+img/
+test.py
+bot_db.sql
