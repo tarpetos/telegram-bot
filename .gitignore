@@ -1,5 +1,7 @@
 .idea/
 venv/
 spamer/
+bot/__pycache__/
+img/
 test.py
 bot_db.sql
