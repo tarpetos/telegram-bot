@@ -1,54 +1,76 @@
-from PIL import Image, ImageFont, ImageDraw
+import random
+import textwrap
+import warnings
+
 import extract_random_data
+
+from PIL import Image, ImageFont, ImageDraw
 
 
 def create_meme():
+    warnings.filterwarnings('ignore', category=DeprecationWarning)
+
     mem_image = Image.open('img/test.jpg')
-    mem_image = change_size_statement(mem_image)
-
-    title_font = ImageFont.truetype('fonts/PlayfairDisplay-Regular.ttf', change_font_size(mem_image))
-
     data = extract_random_data.get_bullshit()
-    title_text = f'{extract_random_data.get_random_data(data)}'
+    mem_text = f'{extract_random_data.get_random_data(data)}'.upper()
 
-    image_editable = ImageDraw.Draw(mem_image)
+    mem_image = change_size_statement(mem_image)
+    text_wrap = textwrap.wrap(mem_text, width=text_wrap_width(mem_image))
 
-    image_editable.text(change_font_place(mem_image, image_editable, title_text), title_text, font=title_font)
+    IMAGE_WIDTH, IMAGE_HEIGHT = mem_image.size
+    draw = ImageDraw.Draw(mem_image)
+    font = ImageFont.truetype('fonts/AdverGothicC.ttf', change_font_size(mem_image))
+
+    rand_col_1 = random.randint(0, 255)
+    rand_col_2 = random.randint(0, 255)
+    rand_col_3 = random.randint(0, 255)
+
+    current_height, padding = IMAGE_HEIGHT / 1.3, 10
+    for new_line in text_wrap:
+        print(new_line, '\t', text_wrap)
+        text_width, text_height = draw.textsize(new_line, font=font)
+        draw.text(((IMAGE_WIDTH - text_width) / 2, current_height),
+                  new_line,
+                  font=font,
+                  fill=(rand_col_1, rand_col_2, rand_col_3))
+        current_height += text_height + padding
+
     mem_image.save('img/result.jpg')
 
 
-def change_size_statement(mem_image):
-    width, height = mem_image.size
-    if (width or height) < 500:
-        new_size = (500, 500)
-        mem_image = mem_image.resize(new_size)
-
-    return mem_image
-
-
-def replace_string(title_text):
-    result = ''
-    for symbols in range(0, len(title_text)):
-        result += title_text.replace(title_text, 'a')
-
-    return result
-
-
-def change_font_place(mem_image, image_editable, title_text):
-    photo_width, photo_height = mem_image.size
-
-    temp_str = replace_string(title_text)
-    text_width, text_height = image_editable.textsize(temp_str)
-
-    return ((photo_width / 2) - (text_width * 2.25)), ((photo_height - text_height) / 1.25)
-
-
-def change_font_size(mem_image):
+def change_size_statement(mem_image: Image) -> Image:
     width, height = mem_image.size
 
-    if (width and height) < 500:
-        return 30
-    elif 1000 > (width and height) >= 500:
-        return 60
+    if width >= 500 and height < 400:
+        return mem_image.resize((width * 2, int(height * 1.75)))
+    elif height >= 500 and width < 400:
+        return mem_image.resize((int(width * 1.75), height * 2))
+    elif height == width or (width > 500 and height > 500):
+        return mem_image
     else:
-        return 90
+        return mem_image.resize((500, 500))
+
+
+def change_font_size(mem_image: Image) -> int:
+    width, height = mem_image.size
+
+    if width >= 500 and height < 400:
+        return 20
+    elif height >= 500 and width < 400:
+        return 20
+    elif height == width and height < 500 and width < 500:
+        return 20
+    elif width > 500 and height > 500:
+        return 30
+    else:
+        return 30
+
+
+def text_wrap_width(mem_image: Image) -> int:
+    temp = change_font_size(mem_image)
+    print('Font size:', temp)
+    if temp == 30:
+        return 15
+    else:
+        return 20
+
