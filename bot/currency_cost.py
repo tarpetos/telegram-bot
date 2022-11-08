@@ -58,14 +58,6 @@ def find_hryvnias_sale_in_dollars() -> str:
     return format(round(float(data_json_list[0]['sale']), 4), '.3f')
 
 
-# def rubles_buy() -> float:
-#     return round(float(find_dollars_buy_in_hryvnias()) / (1 / float(data_json_list[2]['buy'])), 4)
-#
-#
-# def rubles_sale() -> float:
-#     return round(float(find_dollars_buy_in_hryvnias()) / (1 / float(data_json_list[2]['sale'])), 4)
-
-
 def bitcoin_buy() -> float:
     return round(float(data_json_list[3]['buy']), 4)
 
