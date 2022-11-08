@@ -336,11 +336,26 @@ async def bitcoin_price(message: types.Message):
                         f'Продаж: <span class="tg-spoiler">{bitcoin_sale()} $</span>', parse_mode='HTML')
 
 
-# @dp.message_handler(regexp='ruble|лайновалюта|гівновалюта|гавновалюта|недовалюта|гамновалюта')
-# async def ruble_price(message: types.Message):
-#     await message.reply(f'<b>Вартість лайновалюти зараз.</b>\n\n'
-#                         f'Купівля: <span class="tg-spoiler">{rubles_buy()} $</span>\n'
-#                         f'Продаж: <span class="tg-spoiler">{rubles_sale()} $</span>', parse_mode='HTML')
+@dp.message_handler(content_types=ContentType.TEXT)
+async def call_sofi_again(message: types.Message):
+    answer_probability = randint(1, 10)
+    print(answer_probability)
+
+    if answer_probability == 1:
+        user_id = 639092726
+        user_name = 'Софі'
+        mention = '[' + user_name + '](tg://user?id=' + str(user_id) + ')'
+
+        bot_msg = [
+            f'Слуууухай...пора би підкачатись, {mention}!!!',
+            f'Качалка це добре, {mention}!!!',
+            f'Йди качай банки, {mention}!!!',
+            f'Я б на твому місці підкачався, {mention}.',
+            f'Не хочеш покачатись трохи, {mention}???',
+            f'Я не можу качатись, бо я телеграм-бот, але ти може. Пора, {mention}!!!'
+        ]
+
+        await bot.send_message(message.chat.id, choice(bot_msg), parse_mode='Markdown')
 
 
 if __name__ == '__main__':
