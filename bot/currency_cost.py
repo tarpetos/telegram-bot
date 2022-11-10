@@ -1,66 +1,66 @@
 import json
-from config import CURRENCY_URL
+from bot.bot_main.config import CURRENCY_URL
 from urllib.request import urlopen
 
 response = urlopen(CURRENCY_URL)
 data_json_list = json.loads(response.read())
 
 
-def find_dollars_buy_in_hryvnias() -> str:
-    return format(round(1 / float(data_json_list[0]['buy']), 4), '.4f')
+def find_dollars_buy_in_hryvnias() -> float:
+    return 1 / float(data_json_list[0]['buy'])
 
 
-def find_euros_buy_in_hryvnias() -> str:
-    return format(round(1 / float(data_json_list[1]['buy']), 4), '.4f')
+def find_euros_buy_in_hryvnias() -> float:
+    return 1 / float(data_json_list[1]['buy'])
 
 
-def find_dollars_buy_in_euros() -> str:
-    return format(round(float(data_json_list[1]['buy']) / float(data_json_list[0]['buy']), 4), '.4f')
+def find_dollars_buy_in_euros() -> float:
+    return float(data_json_list[1]['buy']) / float(data_json_list[0]['buy'])
 
 
-def find_hryvnias_buy_in_euros() -> str:
-    return format(round(float(data_json_list[1]['buy']), 4), '.3f')
+def find_hryvnias_buy_in_euros() -> float:
+    return float(data_json_list[1]['buy'])
 
 
-def find_euros_buy_in_dollars() -> str:
-    return format(round(float(data_json_list[0]['buy']) / float(data_json_list[1]['buy']), 4), '.4f')
+def find_euros_buy_in_dollars() -> float:
+    return float(data_json_list[0]['buy']) / float(data_json_list[1]['buy'])
 
 
-def find_hryvnias_buy_in_dollars() -> str:
-    return format(round(float(data_json_list[0]['buy']), 4), '.3f')
+def find_hryvnias_buy_in_dollars() -> float:
+    return float(data_json_list[0]['buy'])
 
 
 ########################################################################################################################
 ########################################################################################################################
 
 
-def find_dollars_sale_in_hryvnias() -> str:
-    return format(round(1 / float(data_json_list[0]['sale']), 4), '.4f')
+def find_dollars_sale_in_hryvnias() -> float:
+    return 1 / float(data_json_list[0]['sale'])
 
 
-def find_euros_sale_in_hryvnias() -> str:
-    return format(round(1 / float(data_json_list[1]['sale']), 4), '.4f')
+def find_euros_sale_in_hryvnias() -> float:
+    return 1 / float(data_json_list[1]['sale'])
 
 
-def find_dollars_sale_in_euros() -> str:
-    return format(round(float(data_json_list[1]['sale']) / float(data_json_list[0]['sale']), 4), '.4f')
+def find_dollars_sale_in_euros() -> float:
+    return float(data_json_list[1]['sale']) / float(data_json_list[0]['sale'])
 
 
-def find_hryvnias_sale_in_euros() -> str:
-    return format(round(float(data_json_list[1]['sale']), 4), '.3f')
+def find_hryvnias_sale_in_euros() -> float:
+    return float(data_json_list[1]['sale'])
 
 
-def find_euros_sale_in_dollars() -> str:
-    return format(round(float(data_json_list[0]['sale']) / float(data_json_list[1]['sale']), 4), '.4f')
+def find_euros_sale_in_dollars() -> float:
+    return float(data_json_list[0]['sale']) / float(data_json_list[1]['sale'])
 
 
-def find_hryvnias_sale_in_dollars() -> str:
-    return format(round(float(data_json_list[0]['sale']), 4), '.3f')
+def find_hryvnias_sale_in_dollars() -> float:
+    return float(data_json_list[0]['sale'])
 
 
 def bitcoin_buy() -> float:
-    return round(float(data_json_list[3]['buy']), 4)
+    return float(data_json_list[2]['buy'])
 
 
 def bitcoin_sale() -> float:
-    return round(float(data_json_list[3]['sale']), 4)
+    return float(data_json_list[2]['sale'])
