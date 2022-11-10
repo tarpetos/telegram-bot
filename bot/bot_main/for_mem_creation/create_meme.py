@@ -2,7 +2,7 @@ import random
 import textwrap
 import warnings
 
-import extract_random_data
+from bot.bot_main.for_mem_creation import extract_random_data
 
 from PIL import Image, ImageFont, ImageDraw
 
@@ -26,8 +26,9 @@ def create_meme():
     rand_col_3 = random.randint(0, 255)
 
     current_height, padding = IMAGE_HEIGHT / 1.3, 10
+    print(text_wrap)
     for new_line in text_wrap:
-        print(new_line, '\t', text_wrap)
+        print(new_line)
         text_width, text_height = draw.textsize(new_line, font=font)
         draw.text(((IMAGE_WIDTH - text_width) / 2, current_height),
                   new_line,
