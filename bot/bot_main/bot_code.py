@@ -1,32 +1,39 @@
+import locale
 import os
 import re
 import time
+import requests
 from datetime import date, datetime
 from random import randint, choice
 
-import requests
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters import IsReplyFilter, Text
+from aiogram.dispatcher.filters import IsReplyFilter
 from aiogram.types import InputFile, ContentType, ReplyKeyboardRemove
-from aiogram.utils.callback_data import CallbackData
 
-from bot import parse_link
-from bot import currency_cost as cc
+from bot.bot_main.bot_classes.StoreUsersData import StoreUsersData
+from bot.other_functions import currency_cost as cc
+from bot.parsing import parse_link
 from bot.bot_main.bot_classes.ConverterForm import ConverterForm
 from bot.bot_main.bot_classes.DaysToBirthday import DaysToBirthday
-from bot.bot_main.bot_classes.WeatherInfo import WeatherInfo
 from bot.bot_main.bot_classes.SearchTerm import SearchTerm
+from bot.bot_main.bot_classes.WeatherInfo import WeatherInfo
 from bot.bot_main.config import API_TOKEN, COMMANDS_LIST
 from bot.bot_main.for_mem_creation.create_meme import create_meme
-from bot.bot_main.for_mem_creation.extract_random_data import get_sticker, get_conversation_data, get_random_data
+from bot.bot_main.bot_classes.RandomDataTables import RandomDataTables
+from bot.bot_main.bot_classes.ExtractRandomData import ExtractRandomData
+from bot.bot_main.for_mem_creation.extract_random_data import get_random_data
+from bot.other_functions.check_date_words import check_year, check_month, check_day
 from bot.keyboards import converter_keyboard, currency_keyboard, random_numbers_keyboard
-from bot.parse_temprature import parse_temp_at_time, parse_avarage_precipitation_probability, \
+from bot.parsing.parse_temprature import parse_temp_at_time, parse_avarage_precipitation_probability, \
     parse_minmax_temp, find_avarage_temp_between_two, avarage_day_temp
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
+
+create_tables = RandomDataTables()
+extract_random_data = ExtractRandomData(create_tables)
 
 
 @dp.message_handler(commands=['start'])
@@ -226,13 +233,14 @@ async def search_time(message: types.Message):
     delta = date(current_year, current_month, current_day) - date(current_year, 2, 23)
     days_of_unity = date(current_year, current_month, current_day) - date(1919, 1, 21)
 
+    locale.setlocale(locale.LC_ALL, 'uk_UA.UTF-8')
     await message.reply(
         f'Поточна дата:\t{datetime.now().strftime("%d.%m.%Y")}📅\n'
         f'Поточний час:\t{datetime.now().strftime("%H:%M:%S")}🕔\n'
         f'День тижня:\t{datetime.now().strftime("%A")}\n'
         f'День року:\t{time.localtime().tm_yday}🌞\n'
         f'К-сть днів з початку повномасштабного вторгнення:\t{delta.days}🕊\n'
-        f'Днів Соборності України:\t{days_of_unity.days}🤝'
+        f'День Соборності України:\t{days_of_unity.days}🤝'
     )
 
     anniversary = time.localtime().tm_year - 1919
@@ -261,7 +269,12 @@ async def process_birthday(message: types.Message, state: FSMContext):
             date(int(input_data[2]), int(input_data[1]), int(input_data[0]))
         )
 
-        await message.reply(f'Кількість днів між датами: {answer.days}')
+        years = int(answer.days / 365)
+        months = int((answer.days % 365) / 31)
+        days = answer.days - years * 365 - months * 31
+        await message.reply(f'Кількість днів між вказаною і поточною датою: {answer.days}\n'
+                            f'Форматований запис: '
+                            f'{years} {check_year(years)}, {months} {check_month(months)}, {days} {check_day(days)}')
     except ValueError:
         await message.reply('Дату вказано невірно.')
 
@@ -270,7 +283,8 @@ async def process_birthday(message: types.Message, state: FSMContext):
 
 @dp.message_handler(commands=['sticker'])
 async def choose_sticker(message: types.Message):
-    data = get_sticker()
+
+    data = extract_random_data.get_sticker()
     await bot.send_sticker(message.chat.id, sticker=f'{get_random_data(data)}')
     await message.delete()
 
@@ -279,6 +293,29 @@ async def choose_sticker(message: types.Message):
 async def weather(message: types.Message):
     await WeatherInfo.place.set()
     await message.reply('Введіть назву міста...')
+
+
+@dp.message_handler(commands=['all'])
+async def call_all(message: types.Message):
+    user_id_list = [
+        395897536,
+        # 395897536,
+        661245516,
+        441547155,
+        639092726,
+        881067050,
+        891849290,
+        922145120,
+        420823189,
+        428566833,
+        867324388,
+        685244760
+    ]
+    bot_msg = ''
+    for i in range(len(user_id_list)):
+        mention = '[' + str(i + 1) + '](tg://user?id=' + str(user_id_list[i]) + ')'
+        bot_msg += f' {mention}'
+    await bot.send_message(message.chat.id, bot_msg, parse_mode='Markdown')
 
 
 @dp.message_handler(state=WeatherInfo.place)
@@ -308,24 +345,25 @@ async def process_weather(message: types.Message, state: FSMContext):
 
 @dp.message_handler(regexp=re.compile('^/eugene$|^/eugene@TarpetosBOT$'))
 async def parse_links(message: types.Message):
-    await SearchTerm.search_term.set()
-    await message.answer('Введіть ключові слова для пошуку відео...')
+    if not message.forward_from:
+        await SearchTerm.search_term.set()
+        await message.answer('Введіть ключові слова для пошуку відео...')
 
 
 @dp.message_handler(state=SearchTerm.search_term)
 async def process_links(message: types.Message, state: FSMContext):
     input_data = message.text
 
-    print(input_data)
-    try:
-        answer = parse_link.links_split(input_data)
+    print('Запит для пошуку відео:', input_data)
+    answer = parse_link.links_split(input_data)
 
-        result = ''
-        for i in range(0, 5):
-            result += f'{answer[i]}\n'
+    result = ''
+    for i in range(0, 5):
+        result += f'{answer[i]}\n'
 
+    if "{'result': []}" not in result:
         await message.reply(f'{result}')
-    except ValueError:
+    else:
         await message.answer('По заданому запиту не вдалось знайти посилання.')
 
     await state.finish()
@@ -387,7 +425,17 @@ async def mention_putin(message: types.Message):
 @dp.message_handler(IsReplyFilter(True))
 async def reply_on_reply(message: types.Message):
     if message.reply_to_message.from_user.id == bot.id:
-        if len(message.text) > 3 and message.text.endswith('?'):
+        if message.text.endswith('йди нахуй') or message.text.endswith('пішов нахуй') or \
+                message.text.endswith('іди нахуй') or message.text.endswith('нахуй пішов') or \
+                message.text.endswith('нахуй іди') or message.text.endswith('нахуй йди'):
+
+            answer_list = [
+                'сам йди нахуй',
+                'ти йди нахуй',
+                'нє, ти йди нахуй',
+            ]
+            await message.reply(choice(answer_list))
+        elif len(message.text) > 3 and message.text.endswith('?'):
             answer_list = [
                 'Не знаю.',
                 'В мене немає відповіді на це запитання.',
@@ -413,7 +461,7 @@ async def reply_on_reply(message: types.Message):
             ]
             await message.reply(choice(answer_list))
         else:
-            data = get_conversation_data()
+            data = extract_random_data.get_conversation_data()
             await message.reply(f'{get_random_data(data)}')
 
 
@@ -421,7 +469,7 @@ async def reply_on_reply(message: types.Message):
 async def create_mem(message: types.Message):
     await message.photo[-1].download('img/test.jpg')
     print('Photo downloaded...')
-    create_meme()
+    create_meme(extract_random_data.get_bullshit())
     photo = InputFile('img/result.jpg')
     print('Photo sending...')
     await bot.send_photo(message.chat.id, photo=photo)
@@ -433,7 +481,7 @@ async def voice_reply(message: types.Message):
 
     print('Voice sending...')
     if randint(0, 5) == 3:
-        print('Voice message are sending...')
+        print('Voice message answer are sending...')
         await message.reply_voice(voice=voice)
 
 
@@ -497,7 +545,7 @@ async def mention_anime(message: types.Message):
 
 @dp.message_handler(regexp='martyn|мартин|дтр')
 async def mention_bot(message: types.Message):
-    data = get_conversation_data()
+    data = extract_random_data.get_conversation_data()
     await message.reply(f'{get_random_data(data)}')
 
 
@@ -570,10 +618,28 @@ async def call_sofi_again(message: types.Message):
 
 @dp.message_handler(content_types=ContentType.ANY)
 async def check_bot_usage(message: types.Message):
-    print('Message chat id:', message.chat.id)
-    print('Bot id:', message.bot.id)
-    print('From what id message:', message.from_id)
-    print('Message id:', message.message_id, '\n')
+    chat_id = message.chat.id
+    bot_id = message.bot.id
+    user_id = message.from_id
+    username = message.from_user.username
+    full_name = message.from_user.full_name
+    message_id = message.message_id
+
+    print('Message chat id:', chat_id)
+    print('Bot id:', bot_id)
+    print('From what id message:', user_id)
+    print('From what username:', username)
+    print('From user full name:', full_name)
+    print('Message id:', message_id, '\n')
+
+    if username is None:
+        username = ' '
+
+    if full_name is None:
+        full_name = ' '
+
+    obj = StoreUsersData()
+    obj.connect_to_db(user_id, username, full_name, chat_id)
 
 
 if __name__ == '__main__':

@@ -14,14 +14,6 @@ def links_split(serch_term):
         result_str = result_str.split(",")[0]
         result_str = result_str.strip("'")
         i += 1
-        print(result_str)
         list_of_links.append(result_str)
 
     return list_of_links
-
-
-# links_split('carti')
-
-# links_split('carti')
-# print(links_split('carti'))
-# print(type(links_split('carti')[0]))

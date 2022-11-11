@@ -2,17 +2,16 @@ import random
 import textwrap
 import warnings
 
-from bot.bot_main.for_mem_creation import extract_random_data
+from bot.bot_main.for_mem_creation.extract_random_data import get_random_data
 
 from PIL import Image, ImageFont, ImageDraw
 
 
-def create_meme():
+def create_meme(data):
     warnings.filterwarnings('ignore', category=DeprecationWarning)
 
     mem_image = Image.open('img/test.jpg')
-    data = extract_random_data.get_bullshit()
-    mem_text = f'{extract_random_data.get_random_data(data)}'.upper()
+    mem_text = f'{get_random_data(data)}'.upper()
 
     mem_image = change_size_statement(mem_image)
     text_wrap = textwrap.wrap(mem_text, width=text_wrap_width(mem_image))
