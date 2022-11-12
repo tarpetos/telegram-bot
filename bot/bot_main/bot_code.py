@@ -34,6 +34,7 @@ dp = Dispatcher(bot, storage=MemoryStorage())
 
 create_tables = RandomDataTables()
 extract_random_data = ExtractRandomData(create_tables)
+store_users_data = StoreUsersData()
 
 
 @dp.message_handler(commands=['start'])
@@ -283,7 +284,6 @@ async def process_birthday(message: types.Message, state: FSMContext):
 
 @dp.message_handler(commands=['sticker'])
 async def choose_sticker(message: types.Message):
-
     data = extract_random_data.get_sticker()
     await bot.send_sticker(message.chat.id, sticker=f'{get_random_data(data)}')
     await message.delete()
@@ -299,7 +299,6 @@ async def weather(message: types.Message):
 async def call_all(message: types.Message):
     user_id_list = [
         395897536,
-        # 395897536,
         661245516,
         441547155,
         639092726,
@@ -311,10 +310,12 @@ async def call_all(message: types.Message):
         867324388,
         685244760
     ]
+
     bot_msg = ''
     for i in range(len(user_id_list)):
         mention = '[' + str(i + 1) + '](tg://user?id=' + str(user_id_list[i]) + ')'
-        bot_msg += f' {mention}'
+        bot_msg += mention + ' '
+
     await bot.send_message(message.chat.id, bot_msg, parse_mode='Markdown')
 
 
@@ -383,7 +384,7 @@ async def reply_on_hello(message: types.Message):
 
 
 @dp.message_handler(regexp='пока мартин|мартин пока|мартинко пока|бувай мартин|мартин бувай|мартинко бувай')
-async def reply_on_goodbuy(message: types.Message):
+async def reply_on_goodbye(message: types.Message):
     answer_list = [
         'Пока',
         'Бувай',
@@ -574,16 +575,6 @@ async def mention_putin(message: types.Message):
     await message.reply('БРАВЛІК - ХУЯВЛІК')
 
 
-@dp.message_handler(regexp='sophie|sofiia|sofi|софі|софи')
-async def call_sofi(message: types.Message):
-    for i in range(0, 5):
-        user_id = 639092726
-        user_name = 'SOFI'
-        mention = '[' + user_name + '](tg://user?id=' + str(user_id) + ')'
-        bot_msg = f'WAKE UP, {mention}!!!'
-        await bot.send_message(message.chat.id, bot_msg, parse_mode='Markdown')
-
-
 @dp.message_handler(regexp='bitcoin|біткоін|біток|по чому монєта|шо з монєтою|по чому монета|шо з монетою')
 async def bitcoin_price(message: types.Message):
     await message.reply(
@@ -593,6 +584,21 @@ async def bitcoin_price(message: types.Message):
     )
 
 
+# call Sofi if her name was mentioned
+'''
+@dp.message_handler(regexp='sophie|sofiia|sofi|софі|софи')
+async def call_sofi(message: types.Message):
+    for i in range(0, 5):
+        user_id = 639092726
+        user_name = 'SOFI'
+        mention = '[' + user_name + '](tg://user?id=' + str(user_id) + ')'
+        bot_msg = f'WAKE UP, {mention}!!!'
+        await bot.send_message(message.chat.id, bot_msg, parse_mode='Markdown')
+'''
+
+
+# random mention Sofi
+'''
 @dp.message_handler(content_types=ContentType.TEXT)
 async def call_sofi_again(message: types.Message):
     answer_probability = randint(1, 50)
@@ -614,6 +620,7 @@ async def call_sofi_again(message: types.Message):
         await bot.send_message(message.chat.id, choice(bot_msg), parse_mode='Markdown')
 
     await check_bot_usage(message)
+'''
 
 
 @dp.message_handler(content_types=ContentType.ANY)
@@ -638,8 +645,7 @@ async def check_bot_usage(message: types.Message):
     if full_name is None:
         full_name = ' '
 
-    obj = StoreUsersData()
-    obj.connect_to_db(user_id, username, full_name, chat_id)
+    store_users_data.connect_to_db(user_id, username, full_name, chat_id)
 
 
 if __name__ == '__main__':
