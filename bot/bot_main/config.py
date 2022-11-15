@@ -10,8 +10,8 @@ COMMANDS_LIST = """
 /currency - конвертер валют
 /weather - погода в заданому населеному пункті
 /birthday - обрахунок днів до заданої дати
+/taskscheduler - планувальник завдань
 /help - список команд
 """
 
 CURRENCY_URL = 'https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5'
-# CURRENCY_URL = 'https://api.privatbank.ua/p24api/pubinfo?exchange&json&coursid=11'
