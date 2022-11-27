@@ -39,7 +39,7 @@ async def converter(call: types.CallbackQuery):
 @dp.callback_query_handler(text=['convert_dollar'])
 async def convert_dollar(call: types.CallbackQuery):
     await ConverterForm.dollar.set()
-    await call.answer('Введіть кількість $ для конвертування в євро та гривні...')
+    await call.answer('Введіть кількість $ для конвертування в євро та гривні...', True)
 
 
 @dp.message_handler(state=ConverterForm.dollar)
@@ -68,7 +68,7 @@ async def process_dollar(message: types.Message, state: FSMContext):
 @dp.callback_query_handler(text=['convert_euro'])
 async def convert_euro(call: types.CallbackQuery):
     await ConverterForm.euro.set()
-    await call.answer('Введіть кількість € для конвертування в долари та гривні...')
+    await call.answer('Введіть кількість € для конвертування в долари та гривні...', True)
 
 
 @dp.message_handler(state=ConverterForm.euro)
@@ -96,7 +96,7 @@ async def process_euro(message: types.Message, state: FSMContext):
 @dp.callback_query_handler(text=['convert_hryvnia'])
 async def convert_hryvnia(call: types.CallbackQuery):
     await ConverterForm.hryvnia.set()
-    await call.answer('Введіть кількість ₴ для конвертування в долари та євро...')
+    await call.answer('Введіть кількість ₴ для конвертування в долари та євро...', True)
 
 
 @dp.message_handler(state=ConverterForm.hryvnia)

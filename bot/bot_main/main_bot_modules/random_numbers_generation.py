@@ -14,12 +14,12 @@ async def randomize(message: types.Message):
 @dp.callback_query_handler(text=['random_value_1', 'random_value_2', 'random_value_3', 'random_value_4'])
 async def choose_random(call: types.CallbackQuery):
     if call.data == 'random_value_1':
-        await call.answer(f'Згенероване випадкове число: {randint(0, 10)} 🎲')
+        await call.answer(f'Згенероване випадкове число: {randint(0, 10)} 🎲', True)
     elif call.data == 'random_value_2':
-        await call.answer(f'Згенероване випадкове число: {randint(0, 100)} 🎲')
+        await call.answer(f'Згенероване випадкове число: {randint(0, 100)} 🎲', True)
     elif call.data == 'random_value_3':
-        await call.answer(f'Згенероване випадкове число: {randint(-100, 100)} 🎲')
+        await call.answer(f'Згенероване випадкове число: {randint(-100, 100)} 🎲', True)
     elif call.data == 'random_value_4':
-        await call.answer(f'Згенероване випадкове число: {randint(-1000000, 1000000)} 🎲')
+        await call.answer(f'Згенероване випадкове число:\n{randint(-1000000, 1000000)} 🎲', True)
 
     await call.answer()

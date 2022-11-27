@@ -1,9 +1,12 @@
 import json
-from bot.bot_main.config import CURRENCY_URL
+from bot.bot_main.config import CURRENCY_URL, BITCOIN_URL
 from urllib.request import urlopen
 
 response = urlopen(CURRENCY_URL)
 data_json_list = json.loads(response.read())
+
+bitcoin_response = urlopen(BITCOIN_URL)
+bitcoin_json = json.loads(bitcoin_response.read())
 
 
 def find_dollars_buy_in_hryvnias() -> float:
@@ -54,9 +57,5 @@ def find_hryvnias_sale_in_dollars() -> float:
     return float(data_json_list[0]['sale'])
 
 
-def bitcoin_buy() -> float:
-    return float(data_json_list[2]['buy'])
-
-
-def bitcoin_sale() -> float:
-    return float(data_json_list[2]['sale'])
+def bitcoin_price() -> float:
+    return float(bitcoin_json['price'])

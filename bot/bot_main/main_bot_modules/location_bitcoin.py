@@ -12,7 +12,5 @@ async def bot_location(message: types.Message):
 @dp.message_handler(regexp='bitcoin|біткоін|біток|по чому монєта|шо з монєтою|по чому монета|шо з монетою')
 async def bitcoin_price(message: types.Message):
     await message.reply(
-        f'<b>Вартість Bitcoin зараз.</b>\n\n'
-        f'Купівля: <span class="tg-spoiler">{cc.bitcoin_buy()} $</span>\n'
-        f'Продаж: <span class="tg-spoiler">{cc.bitcoin_sale()} $</span>', parse_mode='HTML'
+        f'<b>Вартість Bitcoin зараз:</b> <span class="tg-spoiler">{cc.bitcoin_price()} $</span>\n', parse_mode='HTML'
     )

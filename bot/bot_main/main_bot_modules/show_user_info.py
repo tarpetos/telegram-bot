@@ -14,12 +14,10 @@ async def user_data(message: types.Message):
     else:
         message.from_user.username = f'<span class="tg-spoiler"><b><i>користувач не має імені🤷</i></b></span>'
 
-    await message.answer(
+    await message.reply(
         f'Ім’я користувача: {message.from_user.username}\n\n'
         'Натисни кнопку, щоб побачити свій ID...', parse_mode='HTML', reply_markup=keyboard_markup
     )
-
-    await message.delete()
 
 
 @dp.callback_query_handler(text='user_id')
