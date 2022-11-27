@@ -32,7 +32,7 @@ async def option_select(call: types.CallbackQuery):
 @dp.callback_query_handler(text=['insert'])
 async def option_insert(call: types.CallbackQuery):
     await TaskScheduler.insert.set()
-    await call.answer('Введіть текст завдання...')
+    await call.answer('Введіть текст завдання...', True)
     await call.message.delete()
 
 
@@ -54,7 +54,7 @@ async def process_insert(message: types.Message, state: FSMContext):
 @dp.callback_query_handler(text=['update'])
 async def option_update(call: types.CallbackQuery):
     await TaskScheduler.update.set()
-    await call.answer('Введіть інформацію у форматі: "значення ID", "текст завдання"')
+    await call.answer('Введіть інформацію у форматі: значення ID, текст завдання', True)
     await call.message.delete()
 
 
@@ -79,7 +79,7 @@ async def process_update(message: types.Message, state: FSMContext):
 @dp.callback_query_handler(text=['delete'])
 async def option_delete(call: types.CallbackQuery):
     await TaskScheduler.delete.set()
-    await call.answer('Введіть ID завдання, яке хочете видалити...')
+    await call.answer('Введіть ID завдання, яке хочете видалити...', True)
     await call.message.delete()
 
 

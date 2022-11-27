@@ -15,3 +15,4 @@ COMMANDS_LIST = """
 """
 
 CURRENCY_URL = 'https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5'
+BITCOIN_URL = 'https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT'
