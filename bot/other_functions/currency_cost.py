@@ -1,5 +1,5 @@
 import json
-from bot.bot_main.config import CURRENCY_URL, BITCOIN_URL
+from config import CURRENCY_URL, BITCOIN_URL
 from urllib.request import urlopen
 
 response = urlopen(CURRENCY_URL)

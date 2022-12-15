@@ -21,24 +21,24 @@ async def search_time(message: types.Message):
 
     locale.setlocale(locale.LC_ALL, 'uk_UA.UTF-8')
     await message.reply(
-        f'Поточна дата:\t{datetime.now().strftime("%d.%m.%Y")}📅\n'
-        f'Поточний час:\t{datetime.now().strftime("%H:%M:%S")}🕔\n'
-        f'День тижня:\t{datetime.now().strftime("%A")}\n'
-        f'День року:\t{time.localtime().tm_yday}🌞\n'
-        f'К-сть днів з початку повномасштабного вторгнення:\t{delta.days}🕊\n'
-        f'День Соборності України:\t{days_of_unity.days}🤝'
+        f'Current date:\t{datetime.now().strftime("%d.%m.%Y")}📅\n'
+        f'Current time:\t{datetime.now().strftime("%H:%M:%S")}🕔\n'
+        f'Day of the week:\t{datetime.now().strftime("%A")}\n'
+        f'Day of the year:\t{time.localtime().tm_yday}🌞\n'
+        f'Number of days after russian full scale invasion to Ukraine:\t{delta.days}🕊\n'
+        f'Day of Unity of Ukraine:\t{days_of_unity.days}🤝'
     )
 
     anniversary = time.localtime().tm_year - 1919
 
     if time.localtime().tm_mon == 1 and time.localtime().tm_mday == 22:
-        await message.answer(f'УРАААА, {anniversary} РІЧНИЦЯ СОБОРНОСТІ УКРАЇНИ')
+        await message.answer(f'WOW, {anniversary}TH ANNIVERSARY OF THE UNITY OF UKRAINE')
 
 
 @dp.message_handler(commands=['birthday'])
 async def get_birthday(message: types.Message):
     await DaysToBirthday.day_month.set()
-    await message.reply('Введіть дату народження (або іншу дату) в форматі дд.мм.рррр...')
+    await message.reply('Enter date of birth (or other date) in format dd.mm.yyyy...')
 
 
 @dp.message_handler(state=DaysToBirthday.day_month)
@@ -58,10 +58,12 @@ async def process_birthday(message: types.Message, state: FSMContext):
         years = int(answer.days / 365)
         months = int((answer.days % 365) / 31)
         days = answer.days - years * 365 - months * 31
-        await message.reply(f'Кількість днів між вказаною і поточною датою: {answer.days}\n'
-                            f'Форматований запис: '
+        await message.reply(f'The number of days between the entered date and the current date: {answer.days}\n'
+                            f'Formatted date: '
                             f'{years} {check_year(years)}, {months} {check_month(months)}, {days} {check_day(days)}')
     except ValueError:
-        await message.reply('Дату вказано невірно.')
+        await message.reply('Your input was incorrect! Try again.')
+    except IndexError:
+        await message.reply('Your input was incorrect! Try again.')
 
     await state.finish()

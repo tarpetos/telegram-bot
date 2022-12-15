@@ -11,7 +11,7 @@ from bot.parsing.parse_temprature import find_avarage_temp_between_two, parse_te
 @dp.message_handler(commands=['weather'])
 async def weather(message: types.Message):
     await WeatherInfo.place.set()
-    await message.reply('Введіть назву міста...')
+    await message.reply('Enter the name of the town...')
 
 
 @dp.message_handler(state=WeatherInfo.place)
@@ -27,14 +27,14 @@ async def process_weather(message: types.Message, state: FSMContext):
             f'{parse_temp_at_time(url)}\n\n'
             f'{parse_minmax_temp(url)}'
             f'{avarage_day_temp(url)}'
-            f'Температура вночі: {temp_list[0]}\n'
-            f'Температура зранку: {temp_list[1]}\n'
-            f'Температура вдень: {temp_list[2]}\n'
-            f'Температура ввечері: {temp_list[3]}\n\n'
-            f'Максимальна ймовірність опадів: {parse_avarage_precipitation_probability(url)}%',
+            f'Night temrature: {temp_list[0]}\n'
+            f'Morning temperature: {temp_list[1]}\n'
+            f'Day temperature: {temp_list[2]}\n'
+            f'Evening temperature: {temp_list[3]}\n\n'
+            f'Maximum chance of precipitation: {parse_avarage_precipitation_probability(url)}%',
             parse_mode='Markdown'
         )
     else:
-        await message.reply('Місто вказано невірно.')
+        await message.reply('Can not find such town name!')
 
     await state.finish()

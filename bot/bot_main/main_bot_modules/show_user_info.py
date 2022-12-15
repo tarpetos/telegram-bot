@@ -15,11 +15,11 @@ async def user_data(message: types.Message):
         message.from_user.username = f'<span class="tg-spoiler"><b><i>користувач не має імені🤷</i></b></span>'
 
     await message.reply(
-        f'Ім’я користувача: {message.from_user.username}\n\n'
-        'Натисни кнопку, щоб побачити свій ID...', parse_mode='HTML', reply_markup=keyboard_markup
+        f'User name: {message.from_user.username}\n\n'
+        'Click the button below to see your ID...', parse_mode='HTML', reply_markup=keyboard_markup
     )
 
 
 @dp.callback_query_handler(text='user_id')
 async def user_id_inline_callback(callback_query: types.CallbackQuery):
-    await callback_query.answer(f'Ваш ID: {callback_query.from_user.id}', True)
+    await callback_query.answer(f'Your ID: {callback_query.from_user.id}', True)
