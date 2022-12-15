@@ -23,7 +23,7 @@ from bot.other_functions import check_for_comma_and_dot, check_for_id_in_table
 from bot.other_functions.check_for_integer import check_password_length_input
 from bot.other_functions.check_for_repetetive_characters import check_if_repeatable_characters_is_present
 from bot.other_functions.close_keyboard import close_keyboard
-from bot.other_functions.get_json import send_json
+from bot.other_functions.work_with_json import send_json, remove_json
 from bot.other_functions.message_delete_exception import message_delete_control
 
 
@@ -251,11 +251,12 @@ async def linux_macos(call: CallbackQuery):
 @dp.callback_query_handler(text=['json_password'])
 async def json_password(call: CallbackQuery):
     await call.message.edit_text(
-        f'<b><i>You can see your json file below: </i></b>',
+        f'<b><i>You can see your json file below.</i></b>',
         parse_mode='HTML', reply_markup=back_to_telegram_generator_keyboard
     )
 
     sent_message = await send_json(call)
+    remove_json(call)
 
     await call.answer()
 

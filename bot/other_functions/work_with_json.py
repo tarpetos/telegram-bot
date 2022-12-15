@@ -1,3 +1,5 @@
+import os
+
 async def send_json(call):
     with open(f'users_json_files/user_json_pass_gen_table_{call.from_user.id}.json', 'rb') as json_file:
         json_content = json_file.read()
@@ -10,3 +12,10 @@ async def send_json(call):
     )
 
     return sent_message
+
+
+def remove_json(call):
+    path_to_json = f'users_json_files/user_json_pass_gen_table_{call.from_user.id}.json'
+
+    if os.path.exists(path_to_json):
+        os.remove(path_to_json)
