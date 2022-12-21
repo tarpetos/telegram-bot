@@ -6,22 +6,26 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery
 
+from bot.bot_main.for_password_generation import password_content_callbacks
+from bot.bot_main.for_password_generation import password_length_callbacks
 from bot.bot_main import main_objects_initialization
+from bot.bot_main.bot_classes.DuplicateDescriptionError import DuplicateDescriptionError
 from bot.bot_main.bot_classes.PasswordGeneratorStates import PasswordGeneratorStates
+from bot.bot_main.for_password_generation.generate_password import main_generation
 from bot.bot_main.main_objects_initialization import dp, bot
-from bot.keyboards.password_generator_back_keyboard import back_to_telegram_generator_keyboard
-from bot.keyboards.password_generator_back_to_second import password_generator_back_to_second
-from bot.keyboards.password_generator_download_app_keyboard import download_app_keyboard
-from bot.keyboards.password_generator_generation_keyboard import third_generator_keyboard
-from bot.keyboards.password_generator_main_create_menu_keyboard import second_generator_keyboard
-from bot.keyboards.password_generator_main_keyboard import password_start_keyboard
-from bot.keyboards.password_generator_radio_keyboard import first_generator_keyboard
-from bot.keyboards.password_generator_return_to_update_keyboard import password_generator_return_to_update
-from bot.keyboards.password_generator_telegram_keyboard import password_telegram_keyboard
-from bot.keyboards.password_generator_update_keyboard import password_generator_update_keyboard
+from bot.keyboards.password_generator.back_keyboard import back_to_telegram_generator_keyboard
+from bot.keyboards.password_generator.download_app_keyboard import download_app_keyboard
+from bot.keyboards.password_generator.generation_keyboard import third_generator_keyboard
+from bot.keyboards.password_generator.radio_keyboard import first_generator_keyboard
+from bot.keyboards.password_generator.set_length_keyboard import second_generator_keyboard
+from bot.keyboards.password_generator.main_keyboard import password_start_keyboard
+from bot.keyboards.password_generator.return_to_update_keyboard import password_generator_return_to_update
+from bot.keyboards.password_generator.telegram_keyboard import password_telegram_keyboard
+from bot.keyboards.password_generator.update_keyboard import password_generator_update_keyboard
 from bot.other_functions import check_for_comma_and_dot, check_for_id_in_table
-from bot.other_functions.check_for_integer import check_password_length_input
 from bot.other_functions.check_for_repetetive_characters import check_if_repeatable_characters_is_present
+from bot.other_functions.check_length_keyboard import keyboard_length_choice
+from bot.other_functions.check_radio_keyboard import keyboard_content_choice
 from bot.other_functions.close_keyboard import close_keyboard
 from bot.other_functions.work_with_json import send_json, remove_json
 from bot.other_functions.message_delete_exception import message_delete_control
@@ -62,7 +66,7 @@ async def option_show_passwords(call: types.CallbackQuery):
         all_passwords = ''.join(
             f'Password №: {password_number}\n'
             f'ID: {password_data[0]}\n'
-            f'Password description: <code>{password_data[1]}</code>\n'
+            f'Description: <code>{password_data[1]}</code>\n'
             f'Password: <code>{password_data[2]}</code>\n'
             f'Length: {password_data[3]}\n'
             f'Has repetetive?: {password_data[4]}\n\n'
@@ -75,9 +79,11 @@ async def option_show_passwords(call: types.CallbackQuery):
                 reply_markup=back_to_telegram_generator_keyboard,
                 parse_mode='HTML'
             )
+
+            await call.answer()
         except aiogram.utils.exceptions.BadRequest:
             await call.message.edit_text(
-                text='<b><i>Your passwords data is too big. I will send you a json file.</i></b>',
+                text='<b><i>Your passwords data is too big. I will send you a JSON file.</i></b>',
                 reply_markup=back_to_telegram_generator_keyboard,
                 parse_mode='HTML'
             )
@@ -89,16 +95,13 @@ async def option_show_passwords(call: types.CallbackQuery):
             await asyncio.sleep(DELETE_TIMEOUT)
             await bot.delete_message(call.message.chat.id, message_id=sent_message.message_id)
 
-    await call.answer()
-
 
 @dp.callback_query_handler(text=['create_password'])
 async def create_password(call: CallbackQuery):
-    await call.message.edit_text(
-        '<b><i>Enter password description and password length (required):</i></b>\n\n',
-        reply_markup=first_generator_keyboard,
-        parse_mode='HTML'
-    )
+    message_text = '<b><i>Choose what your password can contain:</i></b>'
+
+    await call.message.edit_text(text=message_text, parse_mode='HTML', reply_markup=first_generator_keyboard)
+    await call.answer()
 
 
 @dp.callback_query_handler(text=['change_desc_pass'])
@@ -207,7 +210,7 @@ async def process_password_update(message: types.Message, state: FSMContext):
 @dp.callback_query_handler(text=['password_app'])
 async def password_app(call: CallbackQuery):
     await call.message.edit_text(
-        f'<b><i>Choose your system: </i></b>', parse_mode='HTML', reply_markup=download_app_keyboard
+        '<b><i>Choose your system: </i></b>', parse_mode='HTML', reply_markup=download_app_keyboard
     )
     await call.answer()
 
@@ -251,7 +254,7 @@ async def linux_macos(call: CallbackQuery):
 @dp.callback_query_handler(text=['json_password'])
 async def json_password(call: CallbackQuery):
     await call.message.edit_text(
-        f'<b><i>You can see your json file below.</i></b>',
+        '<b><i>You can see your JSON file below.</i></b>',
         parse_mode='HTML', reply_markup=back_to_telegram_generator_keyboard
     )
 
@@ -264,103 +267,174 @@ async def json_password(call: CallbackQuery):
     await bot.delete_message(call.message.chat.id, message_id=sent_message.message_id)
 
 
-@dp.callback_query_handler(text=['all_characters'])
-async def option_all_characters(call: types.CallbackQuery):
-    await call.answer('Now your password can contain all possible characters!', True)
+@dp.callback_query_handler(text=['generate_password'])
+async def generate_password(call: types.CallbackQuery):
+    storage = dp.current_state(chat=call.message.chat.id, user=call.from_user.id)
+    data = await storage.get_data()
+    necessary_keys = ['bot_message_id', 'password_contains', 'password_length']
+    print(data)
+    user_alphabet = data.get('password_contains')
+    user_length = data.get('password_length')
+
+    if all(key in data for key in necessary_keys):
+        alphabet = keyboard_content_choice(user_alphabet)
+        password_length = keyboard_length_choice(user_length)
+        generated_password = main_generation(alphabet, password_length)
+        data.update({'generated_pasword': generated_password})
+
+        await call.answer(cache_time=2)
+
+        await call.message.edit_text(
+            text=f'Your password:\n```{generated_password}```',
+            parse_mode='Markdown'
+        )
+        await call.message.edit_reply_markup(
+            reply_markup=third_generator_keyboard
+        )
+        await storage.set_data(data)
+    else:
+        await call.answer(
+            'You need to press one of the button what your password could '
+            'contain and choose password difficulty first!', True
+        )
 
 
-@dp.callback_query_handler(text=['only_letters'])
-async def option_only_letters(call: types.CallbackQuery):
-    await call.answer('Now your password can contain only small and big english letters!', True)
-
-
-@dp.callback_query_handler(text=['only_digits'])
-async def option_only_digits(call: types.CallbackQuery):
-    await call.answer('Now your password can contain only digits!', True)
-
-
-@dp.callback_query_handler(text=['letters_digits'])
-async def option_letters_digits(call: types.CallbackQuery):
-    await call.answer('Now your password can contain english letters and digits!', True)
-
-
-@dp.callback_query_handler(text=['letters_signs'])
-async def option_letters_signs(call: types.CallbackQuery):
-    await call.answer('Now your password can contain all letters and signs!', True)
-
-
-@dp.callback_query_handler(text=['digits_signs'])
-async def option_digits_signs(call: types.CallbackQuery):
-    await call.answer('Now your password can contain digits and signs!', True)
-
-
-@dp.callback_query_handler(text=['set_description'])
+@dp.callback_query_handler(text=['store_in_db'])
 async def option_set_description(call: types.CallbackQuery):
-    await PasswordGeneratorStates.set_description.set()
-    await call.answer('Enter description text...', True)
-    await call.message.delete()
+    storage = dp.current_state(chat=call.message.chat.id, user=call.from_user.id)
+    data = await storage.get_data()
+    necessary_keys = ['bot_message_id', 'password_contains', 'password_length', 'generated_pasword']
+    print(data)
+
+    if all(key in data for key in necessary_keys):
+        await PasswordGeneratorStates.set_description.set()
+        await call.answer('Enter description text...', True)
+    else:
+        await call.answer(
+            'You need to press one of the button what your password could '
+            'contain, choose password difficulty and generate password first!', True
+        )
+
 
 @dp.message_handler(state=PasswordGeneratorStates.set_description)
 async def process_description(message: types.Message, state: FSMContext):
-    try:
-        if len(message.text) > 384:
-            raise ValueError
+    user_desc = message.text
+    storage = dp.current_state(chat=message.chat.id, user=message.from_user.id)
+    data = await storage.get_data()
+    data.update({'description': f'{user_desc}'})
+    await storage.set_data(data)
+    message_id = data['bot_message_id']
+    print(data)
 
-        # main_objects_initialization.unique_table.insert_into_table((f'pass_gen_table_{message.from_user.id}', message.text)
-        await message.answer('Description saved!', reply_markup=password_generator_back_to_second)
-    except ValueError:
-        await message.answer(
-            'Invalid input!\nToo many characters entered.', reply_markup=password_generator_back_to_second
-        )
+    if 'generated_pasword' in data:
+        try:
+            if len(user_desc) > 384:
+                raise ValueError
 
-    await message_delete_control(message)
+            table_name = f'pass_gen_table_{message.from_id}'
+            user_description = data['description']
+            user_password = data['generated_pasword']
+            password_length = keyboard_length_choice(data['password_length'])
+            has_repetetive = check_if_repeatable_characters_is_present(user_password)
 
-    await state.finish()
+            await message.delete()
 
+            if user_description in main_objects_initialization.unique_table.select_description(table_name):
+                raise DuplicateDescriptionError('Duplicate description in user table.')
+            else:
+                main_objects_initialization.unique_table.insert_password_data(
+                    table_name,
+                    user_description,
+                    user_password,
+                    password_length,
+                    has_repetetive
+                )
 
-@dp.callback_query_handler(text=['set_length'])
-async def option_set_length(call: types.CallbackQuery):
-    await PasswordGeneratorStates.set_length.set()
-    await call.answer('Enter password length...', True)
-    await call.message.delete()
-
-@dp.message_handler(state=PasswordGeneratorStates.set_length)
-async def process_length(message: types.Message, state: FSMContext):
-    user_input = message.text
-
-    try:
-        if check_password_length_input(user_input):
-            pass
-
-        # main_objects_initialization.unique_table.insert_into_table((f'pass_gen_table_{message.from_user.id}', message.text)
-        await message.answer('Password length saved!', reply_markup=password_generator_back_to_second)
-    except ValueError:
-        await message.answer(
-            'Ivalid input!\nPassword length can contain only integers in range from 1 to 384.',
-            reply_markup=password_generator_back_to_second
-        )
-
-    await message_delete_control(message)
+            await message.from_user.bot.edit_message_text(
+                # <b><i>Choose menu option: </i></b>
+                text=f'***Password saved successfuly!!!***\n\n'
+                     f'Your description:\n```{data["description"]}```'
+                     f'Your password:\n```{data["generated_pasword"]}```',
+                chat_id=message.chat.id,
+                message_id=message_id,
+                parse_mode='Markdown'
+            )
+            await message.from_user.bot.edit_message_reply_markup(
+                chat_id=message.chat.id,
+                message_id=message_id,
+                reply_markup=third_generator_keyboard
+            )
+        except ValueError:
+            await message.from_user.bot.edit_message_text(
+                text='Invalid input!\nToo many characters entered.',
+                chat_id=message.chat.id,
+                message_id=message_id,
+            )
+            await message.from_user.bot.edit_message_reply_markup(
+                chat_id=message.chat.id,
+                message_id=message_id,
+                reply_markup=third_generator_keyboard
+            )
+        except DuplicateDescriptionError:
+            await message.from_user.bot.edit_message_text(
+                text='Invalid input!\nDescription already in the table!!!',
+                chat_id=message.chat.id,
+                message_id=message_id,
+            )
+            await message.from_user.bot.edit_message_reply_markup(
+                chat_id=message.chat.id,
+                message_id=message_id,
+                reply_markup=third_generator_keyboard
+            )
 
     await state.finish()
 
 
 @dp.callback_query_handler(text=['next_to_second'])
 async def next_to_second(call: CallbackQuery):
-    await call.message.edit_text(
-        '<b><i>Choose what your password will contain: </i></b>\n\n',
-        reply_markup=second_generator_keyboard,
-        parse_mode='HTML'
-    )
+    storage = dp.current_state(chat=call.message.chat.id, user=call.from_user.id)
+    data = await storage.get_data()
+    necessary_keys = ['bot_message_id', 'password_contains']
+    print(data)
+
+    if 'password_length' not in data:
+        if all(key in data for key in necessary_keys):
+            await call.message.edit_text(
+                '<b><i>Choose the password difficulty:</i></b>\n\n',
+                reply_markup=second_generator_keyboard,
+                parse_mode='HTML'
+            )
+        else:
+            await call.answer('You should select any of these before continue!', True)
+    else:
+        await call.answer()
 
 
 @dp.callback_query_handler(text=['next_to_third'])
 async def next_to_third(call: CallbackQuery):
-    await call.message.edit_text(
-        '<b><i>Generate your password and write it to database! </i></b>\n\n',
-        reply_markup=third_generator_keyboard,
-        parse_mode='HTML'
-    )
+    storage = dp.current_state(chat=call.message.chat.id, user=call.from_user.id)
+    data = await storage.get_data()
+    necessary_keys = ['bot_message_id', 'password_contains', 'password_length']
+    print(data)
+
+    if 'generated_pasword' in data:
+        await call.message.edit_text(
+            text = f'Your password:\n```{data["generated_pasword"]}```',
+            reply_markup = third_generator_keyboard,
+            parse_mode = 'Markdown'
+        )
+    else:
+        if all(key in data for key in necessary_keys):
+            await call.message.edit_text(
+                '<b><i>Generate your password and write it to the database! </i></b>\n\n',
+                reply_markup=third_generator_keyboard,
+                parse_mode='HTML'
+            )
+        else:
+            await call.answer(
+                'You need to choose what will contain your password and choose its difficulty!',
+                True
+            )
 
 
 @dp.callback_query_handler(text=['main_generator_menu'])
@@ -373,27 +447,35 @@ async def main_generator_menu(call: CallbackQuery):
 
 
 @dp.callback_query_handler(text=['back_to_first'])
-async def back_to_second(call: CallbackQuery):
-    await call.message.edit_text(
-        f'<b><i>Choose what your password can contain:</i></b>',
-        parse_mode='HTML', reply_markup=first_generator_keyboard
-    )
+async def back_to_first(call: CallbackQuery):
+    storage = dp.current_state(chat=call.message.chat.id, user=call.from_user.id)
+    data = await storage.get_data()
+    print(data)
+
+    message_text = '<b><i>Choose what your password can contain:</i></b>'
+
+    await call.message.edit_text(text=message_text, parse_mode='HTML', reply_markup=first_generator_keyboard)
     await call.answer()
 
 
 @dp.callback_query_handler(text=['back_to_second'])
-async def back_to_first(call: CallbackQuery):
-    await call.message.edit_text(
-        f'<b><i>Enter password description and password length (required):</i></b>',
-        parse_mode='HTML', reply_markup=second_generator_keyboard
-    )
+async def back_to_second(call: CallbackQuery):
+    storage = dp.current_state(chat=call.message.chat.id, user=call.from_user.id)
+    data = await storage.get_data()
+    user_choice = data.get('password_length')
+    print(user_choice)
+
+    message_text = '<b><i>Choose the password difficulty:</i></b>\n\n'
+
+    await call.message.edit_text(text=message_text, parse_mode='HTML')
+    await call.message.edit_reply_markup(reply_markup=second_generator_keyboard)
     await call.answer()
 
 
 @dp.callback_query_handler(text=['return_to_update_menu'])
 async def return_to_update_menu(call: CallbackQuery):
     await call.message.edit_text(
-        f'<b><i>What do you want to change?:</i></b>',
+        '<b><i>What do you want to change?:</i></b>',
         parse_mode='HTML', reply_markup=password_generator_update_keyboard
     )
     await call.answer()
@@ -402,7 +484,7 @@ async def return_to_update_menu(call: CallbackQuery):
 @dp.callback_query_handler(text=['back_to_telegram_generator'])
 async def back_to_telegram_generator(call: CallbackQuery):
     await call.message.edit_text(
-        f'<b><i>Choose menu option: </i></b>',
+        '<b><i>Choose menu option: </i></b>',
         parse_mode='HTML', reply_markup=password_telegram_keyboard
     )
     await call.answer()

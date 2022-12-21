@@ -2,5 +2,7 @@
 venv/
 spamer/
 **/__pycache__/
+users_json_files/
+bot/bot_main/for_photo_creation/photo_size.txt
 test.py
 bot_db.sql

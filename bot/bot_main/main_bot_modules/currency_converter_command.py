@@ -3,9 +3,9 @@ from aiogram.dispatcher import FSMContext
 
 from bot.bot_main.bot_classes.ConverterForm import ConverterForm
 from bot.bot_main.main_objects_initialization import dp
-from bot.keyboards.converter_keyboard import converter_keyboard
-from bot.keyboards.currency_keyboard import currency_keyboard
-from bot.keyboards.return_keyboard import return_keyboard
+from bot.keyboards.currency_converter.converter_keyboard import converter_keyboard
+from bot.keyboards.currency_converter.currency_keyboard import currency_keyboard
+from bot.keyboards.currency_converter.return_keyboard import return_keyboard
 from bot.other_functions import currency_cost as cc
 from bot.other_functions.close_keyboard import close_keyboard
 

@@ -1,5 +1,5 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from bot.keyboards.return_keyboard import return_button
+from bot.keyboards.currency_converter.return_keyboard import return_button
 
 converter_keyboard = InlineKeyboardMarkup()
 

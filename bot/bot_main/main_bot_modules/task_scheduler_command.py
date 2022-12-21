@@ -6,8 +6,8 @@ from aiogram.dispatcher import FSMContext
 from bot.bot_main import main_objects_initialization
 from bot.bot_main.bot_classes.TaskScheduler import TaskScheduler
 from bot.bot_main.main_objects_initialization import dp
-from bot.keyboards import back_to_planner_keyboard
-from bot.keyboards.scheduler_keyboard import scheduler_keyboard
+from bot.keyboards.task_scheduler import back_to_planner_keyboard
+from bot.keyboards.task_scheduler.scheduler_keyboard import scheduler_keyboard
 from bot.other_functions import check_for_comma_and_dot, check_for_id_in_table
 from bot.other_functions.close_keyboard import close_keyboard
 from bot.other_functions.message_delete_exception import message_delete_control
@@ -71,7 +71,7 @@ async def process_update(message: types.Message, state: FSMContext):
         if int(user_id) not in check_for_id_in_table.check_for_id(message):
             raise ValueError
 
-        main_objects_initialization.unique_table.update_table(f'table_{message.from_user.id}'), user_data, int(user_id)
+        main_objects_initialization.unique_table.update_table(f'table_{message.from_user.id}', user_data, int(user_id))
         await message.answer('Data has been changed!', reply_markup=back_to_planner_keyboard.return_keyboard)
     except ValueError:
         await message.answer('Data is entered incorrectly!', reply_markup=back_to_planner_keyboard.return_keyboard)

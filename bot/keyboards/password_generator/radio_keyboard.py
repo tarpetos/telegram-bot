@@ -1,8 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from bot.keyboards.password_generator.back_keyboard import back_button
 
 first_generator_keyboard = InlineKeyboardMarkup()
-
-from bot.keyboards.password_generator_back_keyboard import back_button
 
 all_button = InlineKeyboardButton(text='All characters', callback_data='all_characters')
 letters_button = InlineKeyboardButton(text='Only letters', callback_data='only_letters')
@@ -20,4 +19,3 @@ first_generator_keyboard.insert(let_sig_button)
 first_generator_keyboard.insert(dig_sig_button)
 first_generator_keyboard.add(back_button)
 first_generator_keyboard.insert(next_button)
-

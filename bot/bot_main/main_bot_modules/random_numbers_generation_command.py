@@ -3,7 +3,7 @@ from random import randint
 from aiogram import types
 
 from bot.bot_main.main_objects_initialization import dp
-from bot.keyboards import random_numbers_keyboard
+from bot.keyboards.random_number import random_numbers_keyboard
 from bot.other_functions.close_keyboard import close_keyboard
 
 

@@ -1,5 +1,3 @@
-import json
-import os
 import mysql
 import mysql.connector
 
@@ -12,7 +10,7 @@ class UniqueTablesForUsers:
             host='localhost',
             user='root',
             passwd='1111',
-            database='unique_tables'
+            database='bot_db'
         )
         self.cur = self.con.cursor()
 
@@ -93,22 +91,36 @@ class UniqueTablesForUsers:
         self.create_table(user_id)
         self.cur.execute(
             '''
-            UPDATE unique_tables.`%s` t
-            SET t.user_data = %s
-            WHERE t.id = %s;
+            UPDATE `%s`
+            SET user_data = %s
+            WHERE id = %s;
             ''',
             (user_id, user_data, table_id)
         )
 
         self.con.commit()
 
+
+    def insert_password_data(self, user_id, user_desc, generated_pass, password_length, has_repetetive):
+        self.create_table(user_id)
+        self.cur.execute(
+            '''
+            INSERT INTO `%s` (password_description, generated_password, password_length, has_repetetive) 
+            VALUES (%s, %s, %s, %s)
+            ''',
+            (user_id, user_desc, generated_pass, password_length, has_repetetive)
+        )
+
+        self.con.commit()
+
+
     def update_password_desc(self, user_id, user_desc, table_id):
         self.create_table(user_id)
         self.cur.execute(
             '''
-            UPDATE unique_tables.`%s` t
-            SET t.password_description = %s
-            WHERE t.id = %s;
+            UPDATE `%s`
+            SET password_description = %s
+            WHERE id = %s;
             ''',
             (user_id, user_desc, table_id)
         )
@@ -120,14 +132,27 @@ class UniqueTablesForUsers:
         self.create_table(user_id)
         self.cur.execute(
             '''
-            UPDATE unique_tables.`%s` t
-            SET t.generated_password = %s, t.password_length = %s, t.has_repetetive = %s
-            WHERE t.id = %s;
+            UPDATE `%s`
+            SET generated_password = %s, password_length = %s, has_repetetive = %s
+            WHERE id = %s;
             ''',
             (user_id, user_password, length, has_repetetive, table_id)
         )
 
         self.con.commit()
+
+
+    def select_description(self, user_id):
+        self.create_table(user_id)
+        self.cur.execute(
+            '''
+            SELECT password_description FROM `%s`
+            ORDER BY id;
+            ''', (user_id,)
+        )
+
+        result = self.cur.fetchall()
+        return str(result)
 
 
     def delete_from_table(self, user_id, table_id):

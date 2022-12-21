@@ -1,6 +1,8 @@
 import os
 
 async def send_json(call):
+    make_json_dir()
+
     with open(f'users_json_files/user_json_pass_gen_table_{call.from_user.id}.json', 'rb') as json_file:
         json_content = json_file.read()
 
@@ -12,6 +14,13 @@ async def send_json(call):
     )
 
     return sent_message
+
+
+def make_json_dir():
+    path = f'users_json_files'
+
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 
 def remove_json(call):

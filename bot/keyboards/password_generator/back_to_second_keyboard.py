@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardMarkup
 
-from bot.keyboards.password_generator_generation_keyboard import back_button
+from bot.keyboards.password_generator.generation_keyboard import back_button
 
 password_generator_back_to_second = InlineKeyboardMarkup()
 

@@ -4,7 +4,7 @@ from aiogram.dispatcher import FSMContext
 
 from bot.bot_main.bot_classes.WeatherInfo import WeatherInfo
 from bot.bot_main.main_objects_initialization import dp
-from bot.parsing.parse_temprature import find_avarage_temp_between_two, parse_temp_at_time, parse_minmax_temp, \
+from bot.parsing.parse_temprature import find_avarage_temp_between_two, parse_minmax_temp, \
     avarage_day_temp, parse_avarage_precipitation_probability
 
 
@@ -24,7 +24,6 @@ async def process_weather(message: types.Message, state: FSMContext):
     if answer.status_code == 200:
         temp_list = find_avarage_temp_between_two(url)
         await message.reply(
-            f'{parse_temp_at_time(url)}\n\n'
             f'{parse_minmax_temp(url)}'
             f'{avarage_day_temp(url)}'
             f'Night temrature: {temp_list[0]}\n'

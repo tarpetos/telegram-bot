@@ -1,13 +1,19 @@
+import re
+from datetime import datetime, timedelta
+
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import ContentType, InputFile
 
-from bot.bot_main import main_objects_initialization
+# from bot.bot_main import main_objects_initialization
 from bot.bot_main.bot_classes.UserSticker import UserSticker
 from bot.bot_main.for_photo_creation.remake_user_photo import create_new_photo_auto_config
 from bot.other_functions import currency_cost as cc
 from bot.bot_main.main_objects_initialization import dp, sticker_table, bot
-from bot.other_functions.non_admin_message_filter import delete_non_admin_message
+from bot.other_functions.check_date_words import check_day
+from bot.other_functions.get_days_and_date_num import exctract_from_user_input_days_and_date, \
+    exctract_from_user_input_days_num
+# from bot.other_functions.non_admin_message_filter import delete_non_admin_message, get_admin_ids
 from bot.other_functions.remove_start_keyword import remove_mem_from_start
 
 
@@ -75,40 +81,96 @@ async def send_auto_config_photo_with_text(message: types.Message):
     await bot.send_photo(message.chat.id, photo=result_photo)
 
 
+@dp.message_handler(
+    regexp=re.compile(
+        '^(Яка дата|Який день) буде через [1-9]+[0-9]* (день|днів|дня)[?]*$|'
+        '^What (date|day) will be after [1-9]+[0-9]* (day|days)[?]*$',
+        re.IGNORECASE
+    )
+)
+async def find_date_after_days_from_current_date(message: types.Message):
+    user_input = message.text
+    extracted_days = exctract_from_user_input_days_num(user_input)
+
+    today = datetime.now()
+    answer = today + timedelta(days=extracted_days)
+    format_answer = answer.strftime('%d.%m.%Y')
+
+    await message.reply(
+        f'After {extracted_days} {check_day(extracted_days)} date will be {format_answer}!'
+    )
+
+
+@dp.message_handler(
+    regexp=re.compile(
+        '^(Яка дата|Який день) буде через [1-9]+[0-9]* (день|днів|дня),* якщо починати з '
+        '([1-9]|0[1-9]|[1-2][0-9]|3[0-1]).([1-9]|0[1-9]|1[0-2]).([1-9]+.*[0-9]+)[?]*$|'
+        '^What (date|day) will be after [1-9]+[0-9]* (day|days) if we start from '
+        '([1-9]|0[1-9]|[1-2][0-9]|3[0-1]).([1-9]|0[1-9]|1[0-2]).([1-9]+.*[0-9]+)[?]*$',
+        re.IGNORECASE
+    )
+)
+async def find_date_after_days(message: types.Message):
+    user_input = message.text
+    extracted_data = exctract_from_user_input_days_and_date(user_input)
+    days_num = extracted_data[0]
+    month_day = extracted_data[1][0]
+    month = extracted_data[1][1]
+    year = extracted_data[1][2]
+
+    try:
+        user_date = datetime(day=month_day, month=month, year=year)
+        format_user_date = user_date.strftime('%d.%m.%Y')
+        answer = user_date + timedelta(days=days_num)
+        format_answer = answer.strftime('%d.%m.%Y')
+
+        await message.reply(
+            f'If start from {format_user_date} after '
+            f'{days_num} {check_day(days_num)}, date will be {format_answer}!'
+        )
+    except ValueError:
+        await message.reply(
+            f'<b>Some data is entered incorrectly!!!</b>\n\n'
+            f'I think the problem is the {month_day} (first number in your date) because '
+            f'the month you entered does not contain such day of the month.',
+            parse_mode='HTML'
+        )
+
+
 # @dp.message_handler(content_types=ContentType.VOICE)
-# async def delete_all_except_admins(message: types.Message):
+# async def delete_voice_except_admins(message: types.Message):
 #     await delete_non_admin_message(message)
-#
-#
+
+
 # @dp.message_handler(content_types=ContentType.VIDEO_NOTE)
-# async def delete_all_except_admins(message: types.Message):
+# async def delete_video_note_except_admins(message: types.Message):
 #     await delete_non_admin_message(message)
 
 
-@dp.message_handler(content_types=ContentType.ANY)
-async def check_bot_usage(message: types.Message):
-    chat_id = message.chat.id
-    bot_id = message.bot.id
-    user_id = message.from_id
-    username = message.from_user.username
-    full_name = message.from_user.full_name
-    message_id = message.message_id
-
-    print('Message chat id:', chat_id)
-    print('Bot id:', bot_id)
-    print('From what id message:', user_id)
-    print('From what username:', username)
-    print('From user full name:', full_name)
-    print('Message id:', message_id)
-    print('Message text:', message.text)
-    print('Message type:', message.content_type)
-    print('Chat type:', message.chat.type)
-    print('Message caption', message.caption, '\n')
-
-    if username is None:
-        username = ' '
-
-    if full_name is None:
-        full_name = ' '
-
-    main_objects_initialization.store_users_data.connect_to_db(user_id, username, full_name, chat_id)
+# @dp.message_handler(content_types=ContentType.ANY)
+# async def check_bot_usage(message: types.Message):
+#     chat_id = message.chat.id
+#     bot_id = message.bot.id
+#     user_id = message.from_id
+#     username = message.from_user.username
+#     full_name = message.from_user.full_name
+#     message_id = message.message_id
+#
+#     print('Message chat id:', chat_id)
+#     print('Bot id:', bot_id)
+#     print('From what id message:', user_id)
+#     print('From what username:', username)
+#     print('From user full name:', full_name)
+#     print('Message id:', message_id)
+#     print('Message text:', message.text)
+#     print('Message type:', message.content_type)
+#     print('Chat type:', message.chat.type)
+#     print('Message caption', message.caption, '\n')
+#
+#     if username is None:
+#         username = ' '
+#
+#     if full_name is None:
+#         full_name = ' '
+#
+#     main_objects_initialization.store_users_data.connect_to_db(user_id, username, full_name, chat_id)

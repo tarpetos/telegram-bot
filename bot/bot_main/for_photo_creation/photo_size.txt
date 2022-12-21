@@ -1,3 +1,0 @@
-Width: <code>233</code>
-Height: <code>500</code>
-Approximate sides ratio: <code>1 : 2.15</code>
