@@ -1,11 +1,11 @@
 import re
 import requests
-from bs4 import BeautifulSoup as BS
+from bs4 import BeautifulSoup as Bs
 
 
 def parse_temp_at_time(url: str) -> str:
     r = requests.get(url)
-    html = BS(r.content, 'html.parser')
+    html = Bs(r.content, 'html.parser')
     time = html.select('.imgBlock p')
     temp_at_time = html.select('.today-temp')
 
@@ -14,17 +14,17 @@ def parse_temp_at_time(url: str) -> str:
 
 def parse_minmax_temp(url: str) -> str:
     r = requests.get(url)
-    html = BS(r.content, 'html.parser')
+    html = Bs(r.content, 'html.parser')
     min_temp = html.select('.min span')
     max_temp = html.select('.max span')
 
-    return 'Мінімальна температура: ' + min_temp[0].text + 'C\n' + \
-           'Максимальна температура: ' + max_temp[0].text + 'C\n'
+    return 'Min temprature: ' + min_temp[0].text + 'C\n' + \
+           'Max temprature: ' + max_temp[0].text + 'C\n'
 
 
 def parse_today_temp(url: str) -> list:
     r = requests.get(url)
-    html = BS(r.content, 'html.parser')
+    html = Bs(r.content, 'html.parser')
 
     today_temp = html.select('.temperature td')
 
@@ -43,7 +43,7 @@ def list_of_tuples(url: str) -> list:
 
 def parse_avarage_precipitation_probability(url: str) -> int:
     r = requests.get(url)
-    html = BS(r.content, 'html.parser')
+    html = Bs(r.content, 'html.parser')
 
     precipitation_probability = html.select('tr:nth-child(8) td')
     count = 0
@@ -91,4 +91,4 @@ def avarage_day_temp(url: str) -> str:
         avarage_temp += int(re.search(r'-*\d+', i).group())
         count += 1
 
-    return 'Середня температура: ' + check_for_negative_temp(avarage_temp / count) + '\n\n'
+    return 'Avarage temprature: ' + check_for_negative_temp(avarage_temp / count) + '\n\n'
