@@ -7,10 +7,11 @@ from aiogram.dispatcher import FSMContext
 
 from bot.bot_main.bot_classes.DaysToBirthday import DaysToBirthday
 from bot.bot_main.main_objects_initialization import dp
+from bot.other_functions.cancel_states import cancel_all_states_if_they_were
 from bot.other_functions.check_date_words import check_year, check_month, check_day
 
 
-@dp.message_handler(commands=['time'])
+@dp.message_handler(state='*', commands=['time'])
 async def search_time(message: types.Message):
     current_year = time.localtime().tm_year
     current_month = time.localtime().tm_mon
@@ -19,11 +20,11 @@ async def search_time(message: types.Message):
     delta = date(current_year, current_month, current_day) - date(current_year, 2, 23)
     days_of_unity = date(current_year, current_month, current_day) - date(1919, 1, 21)
 
-    locale.setlocale(locale.LC_ALL, 'uk_UA.UTF-8')
+    # locale.setlocale(locale.LC_ALL, 'uk_UA.UTF-8') # uncomment this to turn on Ukrainian locale settings
     await message.reply(
         f'Current date:\t{datetime.now().strftime("%d.%m.%Y")}📅\n'
         f'Current time:\t{datetime.now().strftime("%H:%M:%S")}🕔\n'
-        f'Day of the week:\t{datetime.now().strftime("%A")}\n'
+        f'Day of the week:\t{(datetime.now().strftime("%A")).upper()}\n'
         f'Day of the year:\t{time.localtime().tm_yday}🌞\n'
         f'Number of days after russian full scale invasion to Ukraine:\t{delta.days}🕊\n'
         f'Day of Unity of Ukraine:\t{days_of_unity.days}🤝'
@@ -35,7 +36,7 @@ async def search_time(message: types.Message):
         await message.answer(f'WOW, {anniversary}TH ANNIVERSARY OF THE UNITY OF UKRAINE')
 
 
-@dp.message_handler(commands=['birthday'])
+@dp.message_handler(state='*', commands=['birthday'])
 async def get_birthday(message: types.Message):
     await DaysToBirthday.day_month.set()
     await message.reply('Enter date of birth (or other date) in format dd.mm.yyyy...')

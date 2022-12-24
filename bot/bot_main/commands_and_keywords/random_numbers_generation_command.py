@@ -7,7 +7,7 @@ from bot.keyboards.random_number import random_numbers_keyboard
 from bot.other_functions.close_keyboard import close_keyboard
 
 
-@dp.message_handler(commands=['random'])
+@dp.message_handler(state='*', commands=['random'])
 async def randomize(message: types.Message):
     await message.reply('Select a number range: ', reply_markup=random_numbers_keyboard.random_number_keyboard)
 

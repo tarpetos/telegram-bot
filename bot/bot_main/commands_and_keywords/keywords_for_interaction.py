@@ -3,8 +3,10 @@ from datetime import datetime, timedelta
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters import IsReplyFilter
 from aiogram.types import ContentType, InputFile
 
+from bot.bot_main import main_objects_initialization
 # from bot.bot_main import main_objects_initialization
 from bot.bot_main.bot_classes.UserSticker import UserSticker
 from bot.bot_main.for_photo_creation.remake_user_photo import create_new_photo_auto_config
@@ -81,6 +83,16 @@ async def send_auto_config_photo_with_text(message: types.Message):
     await bot.send_photo(message.chat.id, photo=result_photo)
 
 
+@dp.message_handler(IsReplyFilter(True), regexp='^msgd$|пвдв$')
+async def delete_two_messages(message: types.Message):
+    if message.reply_to_message.from_user.id == bot.id:
+        replied_msg_id = message.reply_to_message.message_id
+        await bot.delete_message(chat_id=message.chat.id, message_id=replied_msg_id)
+        await message.delete()
+    else:
+        return
+
+
 @dp.message_handler(
     regexp=re.compile(
         '^(Яка дата|Який день) буде через [1-9]+[0-9]* (день|днів|дня)[?]*$|'
@@ -147,30 +159,31 @@ async def find_date_after_days(message: types.Message):
 #     await delete_non_admin_message(message)
 
 
-# @dp.message_handler(content_types=ContentType.ANY)
-# async def check_bot_usage(message: types.Message):
-#     chat_id = message.chat.id
-#     bot_id = message.bot.id
-#     user_id = message.from_id
-#     username = message.from_user.username
-#     full_name = message.from_user.full_name
-#     message_id = message.message_id
-#
-#     print('Message chat id:', chat_id)
-#     print('Bot id:', bot_id)
-#     print('From what id message:', user_id)
-#     print('From what username:', username)
-#     print('From user full name:', full_name)
-#     print('Message id:', message_id)
-#     print('Message text:', message.text)
-#     print('Message type:', message.content_type)
-#     print('Chat type:', message.chat.type)
-#     print('Message caption', message.caption, '\n')
-#
-#     if username is None:
-#         username = ' '
-#
-#     if full_name is None:
-#         full_name = ' '
-#
-#     main_objects_initialization.store_users_data.connect_to_db(user_id, username, full_name, chat_id)
+@dp.message_handler(content_types=ContentType.ANY)
+async def check_bot_usage(message: types.Message):
+    chat_id = message.chat.id
+    print(chat_id)
+    bot_id = message.bot.id
+    user_id = message.from_id
+    username = message.from_user.username
+    full_name = message.from_user.full_name
+    message_id = message.message_id
+
+    # print('Message chat id:', chat_id)
+    # print('Bot id:', bot_id)
+    # print('From what id message:', user_id)
+    # print('From what username:', username)
+    # print('From user full name:', full_name)
+    # print('Message id:', message_id)
+    # print('Message text:', message.text)
+    # print('Message type:', message.content_type)
+    # print('Chat type:', message.chat.type)
+    # print('Message caption', message.caption, '\n')
+
+    if username is None:
+        username = ' '
+
+    if full_name is None:
+        full_name = ' '
+
+    main_objects_initialization.store_users_data.connect_to_db(user_id, username, full_name, chat_id)

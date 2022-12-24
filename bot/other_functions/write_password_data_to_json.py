@@ -1,3 +1,4 @@
+import base64
 import os
 import json
 
@@ -9,7 +10,7 @@ def write_to_json(user_id, table_rows):
             'Password №': password_number,
             'ID': password_data[0],
             'Password descriptiton': password_data[1],
-            'Password': password_data[2],
+            'Password': base64.b85decode(password_data[2]).decode('UTF-16'),
             'Length': password_data[3],
             'Has repetetive?': password_data[4],
         }
@@ -23,4 +24,4 @@ def write_to_json(user_id, table_rows):
         os.makedirs(directory)
 
     with open(file_path, 'w') as outfile:
-        json.dump(data, outfile, indent=NUMBER_OF_JSON_IDENTS, ensure_ascii=True)
+        json.dump(data, outfile, indent=NUMBER_OF_JSON_IDENTS, ensure_ascii=False)

@@ -9,7 +9,7 @@ from bot.bot_main.main_objects_initialization import dp, bot
 from bot.other_functions.delete_with_delay import delete_messages
 
 
-@dp.message_handler(commands=['photo'])
+@dp.message_handler(state='*', commands=['photo'])
 async def get_photo_config(message: types.Message):
     await PhotoInscription.user_incription_config.set()
     bot_message = await message.reply(

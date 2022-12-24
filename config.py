@@ -51,5 +51,6 @@ COMMAND_LIST = [
     '/help',
 ]
 
-CURRENCY_URL = 'https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5'
+# CURRENCY_URL = 'https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5'
+CURRENCY_URL = 'https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=11'
 BITCOIN_URL = 'https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT'

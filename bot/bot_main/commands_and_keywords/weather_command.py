@@ -8,7 +8,7 @@ from bot.parsing.parse_temprature import find_avarage_temp_between_two, parse_mi
     avarage_day_temp, parse_avarage_precipitation_probability
 
 
-@dp.message_handler(commands=['weather'])
+@dp.message_handler(state='*', commands=['weather'])
 async def weather(message: types.Message):
     await WeatherInfo.place.set()
     await message.reply('Enter the name of the town...')

@@ -1,4 +1,5 @@
 import asyncio
+import base64
 
 import aiogram.utils.exceptions
 import mysql.connector
@@ -6,13 +7,12 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import CallbackQuery
 
-from bot.bot_main.for_password_generation import password_content_callbacks
-from bot.bot_main.for_password_generation import password_length_callbacks
-from bot.bot_main import main_objects_initialization
 from bot.bot_main.bot_classes.DuplicateDescriptionError import DuplicateDescriptionError
 from bot.bot_main.bot_classes.PasswordGeneratorStates import PasswordGeneratorStates
 from bot.bot_main.for_password_generation.generate_password import main_generation
-from bot.bot_main.main_objects_initialization import dp, bot
+from bot.bot_main.for_password_generation import password_content_callbacks
+from bot.bot_main.for_password_generation import password_length_callbacks
+from bot.bot_main.main_objects_initialization import dp, bot, unique_table, store_users_data
 from bot.keyboards.password_generator.back_keyboard import back_to_telegram_generator_keyboard
 from bot.keyboards.password_generator.download_app_keyboard import download_app_keyboard
 from bot.keyboards.password_generator.generation_keyboard import third_generator_keyboard
@@ -30,11 +30,16 @@ from bot.other_functions.close_keyboard import close_keyboard
 from bot.other_functions.work_with_json import send_json, remove_json
 from bot.other_functions.message_delete_exception import message_delete_control
 
-
 DELETE_TIMEOUT = 60
 
-@dp.message_handler(commands=['password'])
+@dp.message_handler(state='*', commands=['password'])
 async def password(message: types.Message):
+    chat_id = message.chat.id
+    user_id = message.from_id
+    username = message.from_user.username
+    full_name = message.from_user.full_name
+    store_users_data.connect_to_db(user_id, username, full_name, chat_id)
+
     await message.reply(
         '<b><i>Welcome to password generator</i></b> 🔒\n\n'
         '<code>'
@@ -58,16 +63,16 @@ async def telegram_password(call: CallbackQuery):
 
 @dp.callback_query_handler(text=['show_password'])
 async def option_show_passwords(call: types.CallbackQuery):
-    select_result = main_objects_initialization.unique_table.select_pass_gen_table(f'pass_gen_table_{call.from_user.id}')
+    select_result = unique_table.select_pass_gen_table(f'pass_gen_table_{call.from_user.id}')
 
     if not select_result:
         await call.message.edit_text('Table has no records', reply_markup=back_to_telegram_generator_keyboard)
     else:
         all_passwords = ''.join(
-            f'Password №: {password_number}\n'
+            f'Password №{password_number}\n'
             f'ID: {password_data[0]}\n'
             f'Description: <code>{password_data[1]}</code>\n'
-            f'Password: <code>{password_data[2]}</code>\n'
+            f'Password: <code>{base64.b85decode(password_data[2]).decode("UTF-16")}</code>\n'
             f'Length: {password_data[3]}\n'
             f'Has repetetive?: {password_data[4]}\n\n'
             for password_number, password_data in enumerate(select_result, 1)
@@ -130,7 +135,7 @@ async def process_description_update(message: types.Message, state: FSMContext):
             raise ValueError
 
 
-        main_objects_initialization.unique_table.update_password_desc(
+        unique_table.update_password_desc(
             f'pass_gen_table_{message.from_user.id}', user_data, int(user_chosen_id)
         )
 
@@ -164,9 +169,10 @@ async def process_password_update(message: types.Message, state: FSMContext):
         if int(user_chosen_id) not in check_for_id_in_table.check_for_password_id(message):
             raise ValueError
 
-        main_objects_initialization.unique_table.update_password(
+        encryped_password = base64.b85encode(user_data.encode('UTF-16'))
+        unique_table.update_password(
             f'pass_gen_table_{message.from_user.id}',
-            user_data,
+            encryped_password,
             user_data_length,
             repetetive_characters_in_password,
             int(user_chosen_id)
@@ -197,7 +203,7 @@ async def process_password_update(message: types.Message, state: FSMContext):
         if int(message.text) not in check_for_id_in_table.check_for_password_id(message):
             raise ValueError
 
-        main_objects_initialization.unique_table.delete_from_table(f'pass_gen_table_{message.from_user.id}', message.text)
+        unique_table.delete_from_password_table(f'pass_gen_table_{message.from_user.id}', message.text)
         await message.answer('Data deleted successfully!', reply_markup=back_to_telegram_generator_keyboard)
     except ValueError:
         await message.answer('Password ID was entered incorrectly!', reply_markup=back_to_telegram_generator_keyboard)
@@ -339,19 +345,19 @@ async def process_description(message: types.Message, state: FSMContext):
 
             await message.delete()
 
-            if user_description in main_objects_initialization.unique_table.select_description(table_name):
+            if user_description in unique_table.select_description(table_name):
                 raise DuplicateDescriptionError('Duplicate description in user table.')
             else:
-                main_objects_initialization.unique_table.insert_password_data(
+                encryped_password = base64.b85encode(user_password.encode('UTF-16'))
+                unique_table.insert_password_data(
                     table_name,
                     user_description,
-                    user_password,
+                    encryped_password,
                     password_length,
                     has_repetetive
                 )
 
             await message.from_user.bot.edit_message_text(
-                # <b><i>Choose menu option: </i></b>
                 text=f'***Password saved successfuly!!!***\n\n'
                      f'Your description:\n```{data["description"]}```'
                      f'Your password:\n```{data["generated_pasword"]}```',
@@ -388,6 +394,7 @@ async def process_description(message: types.Message, state: FSMContext):
             )
 
     await state.finish()
+    await storage.set_data(data)
 
 
 @dp.callback_query_handler(text=['next_to_second'])
@@ -407,6 +414,11 @@ async def next_to_second(call: CallbackQuery):
         else:
             await call.answer('You should select any of these before continue!', True)
     else:
+        await call.message.edit_text(
+            '<b><i>Choose the password difficulty:</i></b>\n\n',
+            parse_mode='HTML'
+        )
+        await call.message.edit_reply_markup(reply_markup=second_generator_keyboard)
         await call.answer()
 
 

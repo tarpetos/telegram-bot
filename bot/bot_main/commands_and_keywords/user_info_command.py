@@ -3,7 +3,7 @@ from aiogram import types
 from bot.bot_main.main_objects_initialization import dp
 
 
-@dp.message_handler(commands=['id'])
+@dp.message_handler(state='*', commands=['id'])
 async def user_data(message: types.Message):
     keyboard_markup = types.InlineKeyboardMarkup()
     user_id_btn = types.InlineKeyboardButton('ID', callback_data='user_id')

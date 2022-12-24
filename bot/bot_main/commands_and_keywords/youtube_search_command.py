@@ -6,7 +6,7 @@ from bot.bot_main.main_objects_initialization import dp
 from bot.parsing import parse_link
 
 
-@dp.message_handler(commands=['eugene'])
+@dp.message_handler(state='*', commands=['eugene'])
 async def parse_links(message: types.Message):
     await SearchTerm.search_term.set()
     await message.reply('Enter a key words for video search in youtube...')

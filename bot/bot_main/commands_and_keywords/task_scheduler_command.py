@@ -13,8 +13,14 @@ from bot.other_functions.close_keyboard import close_keyboard
 from bot.other_functions.message_delete_exception import message_delete_control
 
 
-@dp.message_handler(commands=['taskscheduler'])
+@dp.message_handler(state='*', commands=['taskscheduler'])
 async def scheduler_call(message: types.Message):
+    chat_id = message.chat.id
+    user_id = message.from_id
+    username = message.from_user.username
+    full_name = message.from_user.full_name
+    main_objects_initialization.store_users_data.connect_to_db(user_id, username, full_name, chat_id)
+
     await message.reply('Choose a task scheduler function:', reply_markup=scheduler_keyboard)
 
 

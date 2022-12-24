@@ -10,7 +10,7 @@ from bot.other_functions import currency_cost as cc
 from bot.other_functions.close_keyboard import close_keyboard
 
 
-@dp.message_handler(commands=['currency'])
+@dp.message_handler(state='*', commands=['currency'])
 async def currency(message: types.Message):
     await message.reply('Choose menu option💵:', reply_markup=currency_keyboard)
 
