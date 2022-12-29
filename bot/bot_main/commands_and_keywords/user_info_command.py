@@ -4,7 +4,7 @@ from aiogram import types
 
 from bot.bot_main.for_password_generation.generate_password import generate_token
 from bot.bot_main.main_objects_initialization import dp, store_users_data, token_table, bot
-from bot.keyboards.user_data.token_keyboard import token_keyboard
+from bot.keyboards.token.token_keyboard import token_keyboard
 from bot.other_functions.close_keyboard import close_keyboard
 from bot.other_functions.encryption_decryption import encrypt, decrypt
 
