@@ -1,17 +1,10 @@
-import mysql
-import mysql.connector
-
+from bot.bot_main.bot_classes.ConnectionDB import ConnectionDB
 from bot.other_functions.get_id_and_convert import get_id_from_str
 
 
-class UniqueTablesForUsers:
+class UniqueTablesForUsers(ConnectionDB):
     def __init__(self):
-        self.con = mysql.connector.connect(
-            host='localhost',
-            user='root',
-            passwd='1111',
-            database='bot_db'
-        )
+        super().__init__()
         self.cur = self.con.cursor()
         self.date_id_procedure()
         self.month_avg_statistics_view()
