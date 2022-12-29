@@ -3,6 +3,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 from bot.bot_main.bot_classes.StatisticsTable import StatisticsTable
 from bot.bot_main.bot_classes.UniqueTablesForUsers import UniqueTablesForUsers
+from bot.bot_main.bot_classes.UserToken import UserToken
 from bot.bot_main.bot_classes.UsersDataStore import UsersDataStore
 from bot.bot_main.bot_classes.StickerTable import StickerTable
 from config import API_TOKEN
@@ -15,3 +16,4 @@ store_users_data = UsersDataStore()
 unique_table = UniqueTablesForUsers()
 sticker_table = StickerTable()
 statistics_table = StatisticsTable()
+token_table = UserToken()

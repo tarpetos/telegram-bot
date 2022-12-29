@@ -1,5 +1,4 @@
 import asyncio
-import base64
 
 import aiogram.utils.exceptions
 import mysql.connector
@@ -10,8 +9,10 @@ from aiogram.types import CallbackQuery
 from bot.bot_main.bot_classes.DuplicateDescriptionError import DuplicateDescriptionError
 from bot.bot_main.bot_classes.PasswordGeneratorStates import PasswordGeneratorStates
 from bot.bot_main.for_password_generation.generate_password import main_generation
-from bot.bot_main.for_password_generation import password_content_callbacks
-from bot.bot_main.for_password_generation import password_length_callbacks
+# from bot.bot_main.for_password_generation import password_content_callbacks
+# from bot.bot_main.for_password_generation import password_length_callbacks
+from bot.bot_main.for_password_generation.password_content_callbacks import default_content_keyboard
+from bot.bot_main.for_password_generation.password_length_callbacks import default_length_keyboard
 from bot.bot_main.main_objects_initialization import dp, bot, unique_table, store_users_data
 from bot.keyboards.password_generator.back_keyboard import back_to_telegram_generator_keyboard
 from bot.keyboards.password_generator.download_app_keyboard import download_app_keyboard
@@ -27,6 +28,7 @@ from bot.other_functions.check_for_repetetive_characters import check_if_repeata
 from bot.other_functions.check_length_keyboard import keyboard_length_choice
 from bot.other_functions.check_radio_keyboard import keyboard_content_choice
 from bot.other_functions.close_keyboard import close_keyboard
+from bot.other_functions.encryption_decryption import encrypt, decrypt
 from bot.other_functions.work_with_json import send_json, remove_json
 from bot.other_functions.message_delete_exception import message_delete_control
 
@@ -72,7 +74,7 @@ async def option_show_passwords(call: types.CallbackQuery):
             f'Password №{password_number}\n'
             f'ID: {password_data[0]}\n'
             f'Description: <code>{password_data[1]}</code>\n'
-            f'Password: <code>{base64.b85decode(password_data[2]).decode("UTF-16")}</code>\n'
+            f'Password: <code>{decrypt(password_data[2])}</code>\n'
             f'Length: {password_data[3]}\n'
             f'Has repetetive?: {password_data[4]}\n\n'
             for password_number, password_data in enumerate(select_result, 1)
@@ -169,7 +171,7 @@ async def process_password_update(message: types.Message, state: FSMContext):
         if int(user_chosen_id) not in check_for_id_in_table.check_for_password_id(message):
             raise ValueError
 
-        encryped_password = base64.b85encode(user_data.encode('UTF-16'))
+        encryped_password = encrypt(user_data)
         unique_table.update_password(
             f'pass_gen_table_{message.from_user.id}',
             encryped_password,
@@ -291,8 +293,8 @@ async def generate_password(call: types.CallbackQuery):
         await call.answer(cache_time=2)
 
         await call.message.edit_text(
-            text=f'Your password:\n```{generated_password}```',
-            parse_mode='Markdown'
+            text=f'Your password:\n<code>{generated_password}</code>',
+            parse_mode='HTML'
         )
         await call.message.edit_reply_markup(
             reply_markup=third_generator_keyboard
@@ -348,7 +350,7 @@ async def process_description(message: types.Message, state: FSMContext):
             if user_description in unique_table.select_description(table_name):
                 raise DuplicateDescriptionError('Duplicate description in user table.')
             else:
-                encryped_password = base64.b85encode(user_password.encode('UTF-16'))
+                encryped_password = encrypt(user_password)
                 unique_table.insert_password_data(
                     table_name,
                     user_description,
@@ -358,12 +360,12 @@ async def process_description(message: types.Message, state: FSMContext):
                 )
 
             await message.from_user.bot.edit_message_text(
-                text=f'***Password saved successfuly!!!***\n\n'
-                     f'Your description:\n```{data["description"]}```'
-                     f'Your password:\n```{data["generated_pasword"]}```',
+                text=f'<i><b>Password saved successfuly!!!</b></i>\n\n'
+                     f'Your description:\n<code>{data["description"]}</code>\n'
+                     f'Your password:\n<code>{data["generated_pasword"]}</code>',
                 chat_id=message.chat.id,
                 message_id=message_id,
-                parse_mode='Markdown'
+                parse_mode='HTML'
             )
             await message.from_user.bot.edit_message_reply_markup(
                 chat_id=message.chat.id,
@@ -431,9 +433,9 @@ async def next_to_third(call: CallbackQuery):
 
     if 'generated_pasword' in data:
         await call.message.edit_text(
-            text = f'Your password:\n```{data["generated_pasword"]}```',
+            text = f'Your password:\n<code>{data["generated_pasword"]}</code>',
             reply_markup = third_generator_keyboard,
-            parse_mode = 'Markdown'
+            parse_mode = 'HTML'
         )
     else:
         if all(key in data for key in necessary_keys):
@@ -451,6 +453,12 @@ async def next_to_third(call: CallbackQuery):
 
 @dp.callback_query_handler(text=['main_generator_menu'])
 async def main_generator_menu(call: CallbackQuery):
+    storage = dp.current_state(chat=call.message.chat.id, user=call.from_user.id)
+    await storage.finish()
+
+    default_content_keyboard()
+    default_length_keyboard()
+
     await call.message.edit_text(
         '<b><i>Choose menu option: </i></b>\n\n',
         reply_markup=password_telegram_keyboard,
@@ -495,6 +503,12 @@ async def return_to_update_menu(call: CallbackQuery):
 
 @dp.callback_query_handler(text=['back_to_telegram_generator'])
 async def back_to_telegram_generator(call: CallbackQuery):
+    storage = dp.current_state(chat=call.message.chat.id, user=call.from_user.id)
+    await storage.finish()
+
+    default_content_keyboard()
+    default_length_keyboard()
+
     await call.message.edit_text(
         '<b><i>Choose menu option: </i></b>',
         parse_mode='HTML', reply_markup=password_telegram_keyboard

@@ -80,11 +80,11 @@ class UniqueTablesForUsers:
         )
 
 
-    def trigger_on_delete_task(self, table_name, user_id):
+    def trigger_on_delete_task(self, trigger_name, table_name, user_id):
+        # self.cur.execute('DROP TRIGGER IF EXISTS delete_from_task')
         self.cur.execute(
             '''
-            CREATE TRIGGER 
-            IF NOT EXISTS delete_from_task
+            CREATE TRIGGER IF NOT EXISTS `%s`
             BEFORE DELETE ON `%s`
             FOR EACH ROW
                 BEGIN
@@ -98,15 +98,15 @@ class UniqueTablesForUsers:
                     SET task_sched_delete_num = task_sched_delete_num + 1
                     WHERE usage_date = date_now AND user_id = get_user_id;
                 END
-            ''', (table_name, user_id)
+            ''', (trigger_name, table_name, user_id)
         )
 
 
-    def trigger_change_task(self, table_name, user_id):
+    def trigger_change_task(self, trigger_name,  table_name, user_id):
+        # self.cur.execute('DROP TRIGGER IF EXISTS change_task')
         self.cur.execute(
             '''
-            CREATE TRIGGER 
-            IF NOT EXISTS change_task
+            CREATE TRIGGER IF NOT EXISTS `%s`
             BEFORE UPDATE ON `%s`
             FOR EACH ROW
                 BEGIN
@@ -120,15 +120,15 @@ class UniqueTablesForUsers:
                     SET task_sched_update_num = task_sched_update_num + 1
                     WHERE usage_date = date_now AND user_id = get_user_id;
                 END
-            ''', (table_name, user_id)
+            ''', (trigger_name, table_name, user_id)
         )
 
 
-    def trigger_add_task(self, table_name, user_id):
+    def trigger_add_task(self, trigger_name, table_name, user_id):
+        # self.cur.execute('DROP TRIGGER IF EXISTS add_task')
         self.cur.execute(
             '''
-            CREATE TRIGGER 
-            IF NOT EXISTS add_task
+            CREATE TRIGGER IF NOT EXISTS `%s`
             BEFORE INSERT ON `%s`
             FOR EACH ROW
                 BEGIN
@@ -142,7 +142,7 @@ class UniqueTablesForUsers:
                     SET task_sched_insert_num = task_sched_insert_num + 1
                     WHERE usage_date = date_now AND user_id = get_user_id;
                 END
-            ''', (table_name, user_id)
+            ''', (trigger_name, table_name, user_id)
         )
 
 
@@ -164,10 +164,11 @@ class UniqueTablesForUsers:
         self.create_table(user_id)
 
         converted_id = get_id_from_str(user_id)
+        trigger_name = f'delete_task_{converted_id}'
         self.cur.execute(
             'CALL add_date_and_id(%s)', (converted_id,)
         )
-        self.trigger_on_delete_task(user_id, converted_id)
+        self.trigger_on_delete_task(trigger_name, user_id, converted_id)
 
         self.cur.execute(
             '''
@@ -184,10 +185,11 @@ class UniqueTablesForUsers:
         self.create_table(user_id)
 
         converted_id = get_id_from_str(user_id)
+        trigger_name = f'change_task_{converted_id}'
         self.cur.execute(
             'CALL add_date_and_id(%s)', (converted_id,)
         )
-        self.trigger_change_task(user_id, converted_id)
+        self.trigger_change_task(trigger_name, user_id, converted_id)
 
         self.cur.execute(
             '''
@@ -205,10 +207,11 @@ class UniqueTablesForUsers:
         self.create_table(user_id)
 
         converted_id = get_id_from_str(user_id)
+        trigger_name = f'add_task_{converted_id}'
         self.cur.execute(
             'CALL add_date_and_id(%s)', (converted_id,)
         )
-        self.trigger_add_task(user_id, converted_id)
+        self.trigger_add_task(trigger_name, user_id, converted_id)
 
         self.cur.execute(
             'INSERT IGNORE INTO `%s` (user_data) VALUES (%s)',
@@ -236,11 +239,10 @@ class UniqueTablesForUsers:
         )
 
 
-    def trigger_on_delete_password(self, table_name, user_id):
+    def trigger_on_delete_password(self, trigger_name, table_name, user_id):
         self.cur.execute(
             '''
-            CREATE TRIGGER 
-            IF NOT EXISTS delete_password
+            CREATE TRIGGER IF NOT EXISTS `%s`
             BEFORE DELETE ON `%s`
             FOR EACH ROW
                 BEGIN
@@ -254,15 +256,14 @@ class UniqueTablesForUsers:
                     SET pass_gen_delete_num = pass_gen_delete_num + 1
                     WHERE usage_date = date_now AND user_id = get_user_id;
                 END
-            ''', (table_name, user_id)
+            ''', (trigger_name, table_name, user_id)
         )
 
 
-    def trigger_change_desc_password(self, table_name, user_id):
+    def trigger_change_desc_password(self, trigger_name, table_name, user_id):
         self.cur.execute(
             '''
-            CREATE TRIGGER 
-            IF NOT EXISTS change_desc_or_password
+            CREATE TRIGGER IF NOT EXISTS `%s`
             BEFORE UPDATE ON `%s`
             FOR EACH ROW
                 BEGIN
@@ -276,15 +277,14 @@ class UniqueTablesForUsers:
                     SET pass_gen_update_num = pass_gen_update_num + 1
                     WHERE usage_date = date_now AND user_id = get_user_id;
                 END
-            ''', (table_name, user_id)
+            ''', (trigger_name, table_name, user_id)
         )
 
 
-    def trigger_add_password(self, table_name, user_id):
+    def trigger_add_password(self, trigger_name, table_name, user_id):
         self.cur.execute(
             '''
-            CREATE TRIGGER 
-            IF NOT EXISTS add_password
+            CREATE TRIGGER IF NOT EXISTS `%s`
             BEFORE INSERT ON `%s`
             FOR EACH ROW
                 BEGIN
@@ -298,7 +298,7 @@ class UniqueTablesForUsers:
                     SET pass_gen_insert_num = pass_gen_insert_num + 1
                     WHERE usage_date = date_now AND user_id = get_user_id;
                 END
-            ''', (table_name, user_id)
+            ''', (trigger_name, table_name, user_id)
         )
 
 
@@ -306,7 +306,7 @@ class UniqueTablesForUsers:
         self.create_pass_gen_table(user_id)
         self.cur.execute(
             '''
-            SELECT id, password_description, generated_password, password_length, has_repetetive FROM `%s`
+            SELECT * FROM `%s`
             ORDER BY id;
             ''', (user_id,)
         )
@@ -345,10 +345,11 @@ class UniqueTablesForUsers:
         self.create_table(user_id)
 
         converted_id = get_id_from_str(user_id)
+        trigger_name = f'delete_password_{converted_id}'
         self.cur.execute(
             'CALL add_date_and_id(%s)', (converted_id,)
         )
-        self.trigger_on_delete_password(user_id, converted_id)
+        self.trigger_on_delete_password(trigger_name, user_id, converted_id)
 
         self.cur.execute(
             '''
@@ -365,10 +366,11 @@ class UniqueTablesForUsers:
         self.create_pass_gen_table(user_id)
 
         converted_id = get_id_from_str(user_id)
+        trigger_name = f'change_password_{converted_id}'
         self.cur.execute(
             'CALL add_date_and_id(%s)', (converted_id,)
         )
-        self.trigger_change_desc_password(user_id, converted_id)
+        self.trigger_change_desc_password(trigger_name, user_id, converted_id)
 
         self.cur.execute(
             '''
@@ -386,10 +388,11 @@ class UniqueTablesForUsers:
         self.create_pass_gen_table(user_id)
 
         converted_id = get_id_from_str(user_id)
+        trigger_name = f'change_password_{converted_id}'
         self.cur.execute(
             'CALL add_date_and_id(%s)', (converted_id,)
         )
-        self.trigger_change_desc_password(user_id, converted_id)
+        self.trigger_change_desc_password(trigger_name, user_id, converted_id)
 
         self.cur.execute(
             '''
@@ -407,10 +410,11 @@ class UniqueTablesForUsers:
         self.create_pass_gen_table(user_id)
 
         converted_id = get_id_from_str(user_id)
+        trigger_name = f'add_password_{converted_id}'
         self.cur.execute(
             'CALL add_date_and_id(%s)', (converted_id,)
         )
-        self.trigger_add_password(user_id, converted_id)
+        self.trigger_add_password(trigger_name, user_id, converted_id)
 
         self.cur.execute(
             '''

@@ -6,6 +6,15 @@ from bot.keyboards.password_generator.set_length_keyboard import very_easy_butto
 from bot.other_functions.change_state_mem_storage import update_with_length_state
 
 
+def default_length_keyboard():
+    very_easy_button.text = 'Very easy'
+    easy_button.text = 'Easy'
+    normal_button.text = 'Normal'
+    hard_button.text = 'Hard'
+    very_hard_button.text = 'Very hard'
+    unbreakable_button.text = 'Unbreakable'
+
+
 @dp.callback_query_handler(text=['very_easy'])
 async def option_very_easy(call: types.CallbackQuery):
     result = await update_with_length_state(call)

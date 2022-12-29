@@ -6,6 +6,15 @@ from bot.keyboards.password_generator.radio_keyboard import first_generator_keyb
 from bot.other_functions.change_state_mem_storage import update_state
 
 
+def default_content_keyboard():
+    all_button.text = 'All characters'
+    letters_button.text = 'Only letters'
+    digits_button.text = 'Only digits'
+    let_dig_button.text = 'Letters & digits'
+    let_sig_button.text = 'Letters & signs'
+    dig_sig_button.text = 'Digits & signs'
+
+
 @dp.callback_query_handler(text=['all_characters'])
 async def option_all_characters(call: types.CallbackQuery):
     result = await update_state(call)
