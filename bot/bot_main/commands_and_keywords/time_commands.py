@@ -1,4 +1,3 @@
-import locale
 import time
 from datetime import date, datetime
 
@@ -7,32 +6,30 @@ from aiogram.dispatcher import FSMContext
 
 from bot.bot_main.bot_classes.DaysToBirthday import DaysToBirthday
 from bot.bot_main.main_objects_initialization import dp
-from bot.other_functions.cancel_states import cancel_all_states_if_they_were
 from bot.other_functions.check_date_words import check_year, check_month, check_day
 
 
 @dp.message_handler(state='*', commands=['time'])
 async def search_time(message: types.Message):
-    current_year = time.localtime().tm_year
-    current_month = time.localtime().tm_mon
-    current_day = time.localtime().tm_mday
+    utc_time = datetime.utcnow()
+    current_year = utc_time.timetuple().tm_year
+    current_month = utc_time.timetuple().tm_mon
+    current_day = utc_time.timetuple().tm_mday
 
-    delta = date(current_year, current_month, current_day) - date(current_year, 2, 23)
+    delta = date(current_year, current_month, current_day) - date(2022, 2, 23)
     days_of_unity = date(current_year, current_month, current_day) - date(1919, 1, 21)
 
-    # locale.setlocale(locale.LC_ALL, 'uk_UA.UTF-8') # uncomment this to turn on Ukrainian locale settings
     await message.reply(
-        f'Current date:\t{datetime.now().strftime("%d.%m.%Y")}📅\n'
-        f'Current time:\t{datetime.now().strftime("%H:%M:%S")}🕔\n'
-        f'Day of the week:\t{(datetime.now().strftime("%A")).upper()}\n'
-        f'Day of the year:\t{time.localtime().tm_yday}🌞\n'
-        f'Number of days after russian full scale invasion to Ukraine:\t{delta.days}🕊\n'
-        f'Day of Unity of Ukraine:\t{days_of_unity.days}🤝'
+        f'Current date:\t{utc_time.strftime("%d.%m.%Y UTC")} 📅\n'
+        f'Current time:\t{utc_time.strftime("%H:%M:%S UTC")} 🕔\n'
+        f'Day of the week:\t{(utc_time.strftime("%A")).upper()}\n'
+        f'Day of the year:\t{utc_time.timetuple().tm_yday} 🌞\n'
+        f'Number of days after russian full scale invasion to Ukraine:\t{delta.days} 🕊\n'
+        f'Day of Unity of Ukraine:\t{days_of_unity.days} 🤝'
     )
 
-    anniversary = time.localtime().tm_year - 1919
-
-    if time.localtime().tm_mon == 1 and time.localtime().tm_mday == 22:
+    if current_month == 1 and current_day == 22:
+        anniversary = current_year - 1919
         await message.answer(f'WOW, {anniversary}TH ANNIVERSARY OF THE UNITY OF UKRAINE')
 
 

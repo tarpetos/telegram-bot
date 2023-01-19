@@ -6,17 +6,29 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import IsReplyFilter
 from aiogram.types import ContentType, InputFile
 
-from bot.bot_main import main_objects_initialization
-# from bot.bot_main import main_objects_initialization
 from bot.bot_main.bot_classes.UserSticker import UserSticker
 from bot.bot_main.for_photo_creation.remake_user_photo import create_new_photo_auto_config
 from bot.other_functions import currency_cost as cc
-from bot.bot_main.main_objects_initialization import dp, sticker_table, bot
+from bot.bot_main.main_objects_initialization import dp, sticker_table, bot, unique_table, store_users_data
 from bot.other_functions.check_date_words import check_day
 from bot.other_functions.get_days_and_date_num import exctract_from_user_input_days_and_date, \
     exctract_from_user_input_days_num
 # from bot.other_functions.non_admin_message_filter import delete_non_admin_message, get_admin_ids
-from bot.other_functions.remove_start_keyword import remove_mem_from_start
+from bot.other_functions.remove_start_keyword import remove_mem_from_start, remove_rand_mem_from_start
+
+
+@dp.message_handler(regexp='^dtr delete tasks$|^дтр видали завдання$')
+async def tasks_delete(message: types.Message):
+    user_id = message.from_id
+    unique_table.drop_remake_task_table(user_id)
+    await message.reply(text='All tasks successfully deleted!!!')
+
+
+@dp.message_handler(regexp='^dtr delete passwords$|^дтр видали паролі$')
+async def passwords_delete(message: types.Message):
+    user_id = message.from_id
+    unique_table.drop_remake_password_table(user_id)
+    await message.reply(text='All passwords successfully deleted!!!')
 
 
 @dp.message_handler(regexp='^location$|^місцезнаходження$')
@@ -45,16 +57,21 @@ async def help_with_photo(message: types.Message):
     await message.reply(
         '<b><i>Below you can see examples how to use command</i></b> /photo\n\n'
         '<code>example</code> - only one argument. Text "example" '
-        'will be printed in the top left corner, font size = 20.\n'
+        'will be printed in the top left corner, font size = 20.\n\n'
+        
         '<code>example//40</code> - two arguments. Text "example" '
-        'will be printed in the top left corner, font size = 40.\n'
-        '<code>100//200</code> - two arguments.  Resize photo: width = 100, height = 200\n'
+        'will be printed in the top left corner, font size = 40.\n\n'
+        
+        '<code>100//200</code> - two arguments.  Resize photo: width = 100, height = 200\n\n'
+        
         '<code>example//100//200</code> - three arguments. Text "example" '
         'will be printed in position where coordinate X = 100 '
-        'and coordinate Y = 200, font size = 20.\n'
+        'and coordinate Y = 200, font size = 20.\n\n'
+        
         '<code>example//100//200//40</code> - four arguments. Text "example" '
         'will be printed in position where coordinate X = 100 '
-        'and coordinate Y = 200, font size = 40.\n'
+        'and coordinate Y = 200, font size = 40.\n\n'
+        
         '<code>example//100//200//1000//2000//50</code> - six arguments. Text "example" '
         'will be printed in position where coordinate X = 100 '
         'and coordinate Y = 200. New width will be equal to 1000 and height - 2000, font size = 50.\n',
@@ -70,6 +87,19 @@ async def create_photo(message: types.Message, state: FSMContext):
     await state.finish()
 
 
+@dp.message_handler(regexp='^random mem|^рандом мем', content_types=ContentType.PHOTO)
+async def send_auto_config_photo_with_rand_text_clr(message: types.Message):
+    photo = message.photo[-1]
+    await photo.download(destination_file='imgs/test_auto_conf.jpg')
+    get_user_photo_caption = message.caption
+    formatted_text = remove_rand_mem_from_start(get_user_photo_caption)
+
+    create_new_photo_auto_config(False, formatted_text)
+
+    result_photo = InputFile('imgs/result_auto_conf.jpg')
+    await bot.send_photo(message.chat.id, photo=result_photo)
+
+
 @dp.message_handler(regexp='^mem|^мем', content_types=ContentType.PHOTO)
 async def send_auto_config_photo_with_text(message: types.Message):
     photo = message.photo[-1]
@@ -77,7 +107,7 @@ async def send_auto_config_photo_with_text(message: types.Message):
     get_user_photo_caption = message.caption
     formatted_text = remove_mem_from_start(get_user_photo_caption)
 
-    create_new_photo_auto_config(formatted_text)
+    create_new_photo_auto_config(True, formatted_text)
 
     result_photo = InputFile('imgs/result_auto_conf.jpg')
     await bot.send_photo(message.chat.id, photo=result_photo)
@@ -186,4 +216,4 @@ async def check_bot_usage(message: types.Message):
     if full_name is None:
         full_name = ' '
 
-    main_objects_initialization.store_users_data.connect_to_db(user_id, username, full_name, chat_id)
+    store_users_data.connect_to_db(user_id, username, full_name, chat_id)

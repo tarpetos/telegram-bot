@@ -414,6 +414,8 @@ async def next_to_second(call: CallbackQuery):
                 parse_mode='HTML'
             )
         else:
+            await call.message.edit_text(text='<i><b>Choose what your password can contain:</b></i>', parse_mode='HTML')
+            await call.message.edit_reply_markup(reply_markup=first_generator_keyboard)
             await call.answer('You should select any of these before continue!', True)
     else:
         await call.message.edit_text(
@@ -432,11 +434,20 @@ async def next_to_third(call: CallbackQuery):
     print(data)
 
     if 'generated_pasword' in data:
-        await call.message.edit_text(
-            text = f'Your password:\n<code>{data["generated_pasword"]}</code>',
-            reply_markup = third_generator_keyboard,
-            parse_mode = 'HTML'
-        )
+        if data['description']:
+            await call.message.edit_text(
+                text = f'<i><b>Password saved successfuly!!!</b></i>\n\n'
+                       f'Your description:\n<code>{data["description"]}</code>\n'
+                       f'Your password:\n<code>{data["generated_pasword"]}</code>',
+                reply_markup = third_generator_keyboard,
+                parse_mode = 'HTML'
+            )
+        else:
+            await call.message.edit_text(
+                text=f'Your password:\n<code>{data["generated_pasword"]}</code>',
+                reply_markup=third_generator_keyboard,
+                parse_mode='HTML'
+            )
     else:
         if all(key in data for key in necessary_keys):
             await call.message.edit_text(
@@ -445,10 +456,9 @@ async def next_to_third(call: CallbackQuery):
                 parse_mode='HTML'
             )
         else:
-            await call.answer(
-                'You need to choose what will contain your password and choose its difficulty!',
-                True
-            )
+            await call.message.edit_text(text='<i><b>Choose the password difficulty:</b></i>', parse_mode='HTML')
+            await call.message.edit_reply_markup(reply_markup=second_generator_keyboard)
+            await call.answer('You need to choose what will contain your password and choose its difficulty!', True)
 
 
 @dp.callback_query_handler(text=['main_generator_menu'])

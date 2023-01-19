@@ -54,9 +54,6 @@ class UniqueTablesForUsers(ConnectionDB):
         self.con.commit()
 
 
-    def cursor_usage(self):
-        pass
-
 ########################################################################################################################
 #################################################### TASK SCHEDULER ####################################################
 ########################################################################################################################
@@ -71,6 +68,12 @@ class UniqueTablesForUsers(ConnectionDB):
             )
             ''', (user_id,)
         )
+
+
+    def drop_remake_task_table(self, user_id):
+        table_name = f'table_{user_id}'
+        self.cur.execute('DROP TABLE IF EXISTS `%s`', (table_name,))
+        self.create_table(table_name)
 
 
     def trigger_on_delete_task(self, trigger_name, table_name, user_id):
@@ -230,6 +233,12 @@ class UniqueTablesForUsers(ConnectionDB):
             )
             ''', (user_id,)
         )
+
+
+    def drop_remake_password_table(self, user_id):
+        table_name = f'pass_gen_table_{user_id}'
+        self.cur.execute('DROP TABLE IF EXISTS `%s`', (table_name,))
+        self.create_pass_gen_table(table_name)
 
 
     def trigger_on_delete_password(self, trigger_name, table_name, user_id):
@@ -418,3 +427,16 @@ class UniqueTablesForUsers(ConnectionDB):
         )
 
         self.con.commit()
+
+
+    def check_tables_to_allow_token(self, user_id):
+        self.cur.execute('SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = %s', ('bot_db',))
+
+        all_tables_tuple_lst = self.cur.fetchall()
+        all_tables_lst = [table_tuple[0] for table_tuple in all_tables_tuple_lst]
+
+        table_name = f"'pass_gen_table_{user_id}'"
+        if table_name in all_tables_lst:
+            return True
+        else:
+            return False
