@@ -146,7 +146,7 @@ async def process_description_update(message: types.Message, state: FSMContext):
         await message.answer('Entered data was incorrect!', reply_markup=password_generator_return_to_update)
     except mysql.connector.errors.IntegrityError:
         await message.answer(
-            'Password with such description already exists', reply_markup=password_generator_return_to_update
+            'Password with such description already exists!', reply_markup=password_generator_return_to_update
         )
 
     await message_delete_control(message)
@@ -185,7 +185,7 @@ async def process_password_update(message: types.Message, state: FSMContext):
         await message.answer('Entered data was incorrect!', reply_markup=password_generator_return_to_update)
     except mysql.connector.errors.IntegrityError:
         await message.answer(
-            'Password with such description already exists', reply_markup=password_generator_return_to_update
+            'Password with such description already exists!', reply_markup=password_generator_return_to_update
         )
 
     await message_delete_control(message)

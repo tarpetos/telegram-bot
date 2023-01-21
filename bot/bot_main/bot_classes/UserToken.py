@@ -11,7 +11,6 @@ class UserToken(ConnectionDB):
     def create_table(self):
         self.cur.execute(
             '''
-            
             CREATE TABLE IF NOT EXISTS generated_tokens (
                 id INT PRIMARY KEY AUTO_INCREMENT,
                 user_id INT NOT NULL,

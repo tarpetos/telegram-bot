@@ -225,7 +225,7 @@ class UniqueTablesForUsers(ConnectionDB):
             '''
             CREATE TABLE IF NOT EXISTS `%s` (
                 id INT PRIMARY KEY AUTO_INCREMENT,
-                password_description VARCHAR(384),
+                password_description VARCHAR(384) COLLATE utf8mb4_bin,
                 generated_password VARCHAR(384),
                 password_length INT,
                 has_repetetive BOOLEAN,
