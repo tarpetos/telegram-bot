@@ -4,7 +4,7 @@ UA_COMMAND_DESC_LIST = '''
 /start - перевірка роботи бота
 /random - генерація випадкового цілого числа
 /eugene - функція пошуку відео
-/id - інформація про користувача
+/token - генерація токенів
 /time - дата, поточний час та інша інформація стосовно часу
 /sticker - відправляє випадковий стікер
 /currency - конвертер валют
@@ -21,7 +21,7 @@ EN_COMMAND_DESC_LIST = '''
 /start - check if bot is working
 /random - generate random integer number
 /eugene - youtube video search
-/id - information about user
+/token - token generation
 /time - current date, time and other time info
 /sticker - send a random sticker
 /currency - currency converter

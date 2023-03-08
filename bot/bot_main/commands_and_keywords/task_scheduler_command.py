@@ -27,7 +27,6 @@ async def scheduler_call(message: types.Message):
 @dp.callback_query_handler(text=['select'])
 async def option_select(call: types.CallbackQuery):
     select_result = main_objects_initialization.unique_table.select_table('table_' + str(call.from_user.id))
-    print(select_result)
     if not select_result:
         await call.message.edit_text('Table has no records', reply_markup=back_to_planner_keyboard.return_keyboard)
     else:

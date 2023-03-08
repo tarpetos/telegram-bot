@@ -6,10 +6,18 @@ from bot.keyboards.password_generator.radio_keyboard import first_generator_keyb
 from bot.other_functions.change_state_mem_storage import update_state
 
 
+def default_content_keyboard():
+    all_button.text = 'All characters'
+    letters_button.text = 'Only letters'
+    digits_button.text = 'Only digits'
+    let_dig_button.text = 'Letters & digits'
+    let_sig_button.text = 'Letters & signs'
+    dig_sig_button.text = 'Digits & signs'
+
+
 @dp.callback_query_handler(text=['all_characters'])
 async def option_all_characters(call: types.CallbackQuery):
     result = await update_state(call)
-    print(result)
 
     await call.answer(
         'Now your password can contain all posible characters!',
@@ -32,7 +40,6 @@ async def option_all_characters(call: types.CallbackQuery):
 @dp.callback_query_handler(text=['only_letters'])
 async def option_only_letters(call: types.CallbackQuery):
     result = await update_state(call)
-    print(result)
     await call.answer(
         'Now your password can contain only small and big english letters!',
         True
@@ -54,7 +61,6 @@ async def option_only_letters(call: types.CallbackQuery):
 @dp.callback_query_handler(text=['only_digits'])
 async def option_only_digits(call: types.CallbackQuery):
     result = await update_state(call)
-    print(result)
     await call.answer(
         'Now your password can contain only digits!',
         True
@@ -76,7 +82,6 @@ async def option_only_digits(call: types.CallbackQuery):
 @dp.callback_query_handler(text=['letters_digits'])
 async def option_letters_digits(call: types.CallbackQuery):
     result = await update_state(call)
-    print(result)
     await call.answer(
         'Now your password can contain english letters and digits!',
         True
@@ -98,7 +103,6 @@ async def option_letters_digits(call: types.CallbackQuery):
 @dp.callback_query_handler(text=['letters_signs'])
 async def option_letters_signs(call: types.CallbackQuery):
     result = await update_state(call)
-    print(result)
     await call.answer(
         'Now your password can contain all letters and signs!',
         True
@@ -120,7 +124,6 @@ async def option_letters_signs(call: types.CallbackQuery):
 @dp.callback_query_handler(text=['digits_signs'])
 async def option_digits_signs(call: types.CallbackQuery):
     result = await update_state(call)
-    print(result)
 
     await call.answer(
         'Now your password can contain digits and signs!',

@@ -48,16 +48,17 @@ async def process_dollar(message: types.Message, state: FSMContext):
     input_data = message.text
 
     try:
+        input_data = input_data.replace(',','.')
         answer = float(input_data)
 
         await message.reply(
-            f'Cost of buying dollars in hryvnias: '
+            f'Cost of buying {input_data} dollars in hryvnias: '
             f'{answer / cc.find_dollars_buy_in_hryvnias():.4f}\n'
-            f'Selling price of dollars in hryvnias: '
+            f'Selling price of {input_data} dollars in hryvnias: '
             f'{answer / cc.find_dollars_sale_in_hryvnias():.4f}\n'
-            f'Cost of buying dollars in euros: '
+            f'Cost of buying {input_data} dollars in euros: '
             f'{answer / cc.find_dollars_buy_in_euros():.4f}\n'
-            f'Selling price of dollars in euros: '
+            f'Selling price of {input_data} dollars in euros: '
             f'{answer / cc.find_dollars_sale_in_euros():.4f}\n',
         )
     except ValueError:
@@ -77,15 +78,17 @@ async def process_euro(message: types.Message, state: FSMContext):
     input_data = message.text
 
     try:
+        input_data = input_data.replace(',', '.')
         answer = float(input_data)
+
         await message.reply(
-            f'Cost of buying euros in hryvnias: '
+            f'Cost of buying {input_data} euros in hryvnias: '
             f'{answer / cc.find_euros_buy_in_hryvnias():.4f}\n'
-            f'Selling price of euros in hryvnias: '
+            f'Selling price of {input_data} euros in hryvnias: '
             f'{answer / cc.find_euros_sale_in_hryvnias():.4f}\n'
-            f'Cost of buying euros in dollars: '
+            f'Cost of buying {input_data} euros in dollars: '
             f'{answer / cc.find_euros_buy_in_dollars():.4f}\n'
-            f'Selling price of euros in dollars: '
+            f'Selling price of {input_data} euros in dollars: '
             f'{answer / cc.find_euros_sale_in_dollars():.4f}\n',
         )
     except ValueError:
@@ -105,15 +108,17 @@ async def process_hryvnia(message: types.Message, state: FSMContext):
     input_data = message.text
 
     try:
+        input_data = input_data.replace(',', '.')
         answer = float(input_data)
+
         await message.reply(
-            f'Cost of buying hryvnias in dollars:'
+            f'Cost of buying {input_data} hryvnias in dollars:'
             f'{answer / cc.find_hryvnias_buy_in_dollars():.4f}\n'
-            f'Selling price of hryvnias in dollars: '
+            f'Selling price of {input_data} hryvnias in dollars: '
             f'{answer / cc.find_hryvnias_sale_in_dollars():.4f}\n'
-            f'Cost of buying hryvnias in euros: '
+            f'Cost of buying {input_data} hryvnias in euros: '
             f'{answer / cc.find_hryvnias_buy_in_euros():.4f}\n'
-            f'Selling price of hryvnias in euros: '
+            f'Selling price of {input_data} hryvnias in euros: '
             f'{answer / cc.find_hryvnias_sale_in_euros():.4f}\n',
         )
     except ValueError:

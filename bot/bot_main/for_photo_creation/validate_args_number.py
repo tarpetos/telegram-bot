@@ -21,13 +21,11 @@ async def validate_args(formatted_lst, message):
                 img_font=int(formatted_lst[3]),
             )
         elif len(formatted_lst) == 2 and check_for_int_type(formatted_lst[0], formatted_lst[1]):
-            print('something')
             get_error_state = create_new_photo(
                 img_width=int(formatted_lst[0]),
                 img_height=int(formatted_lst[1]),
             )
         elif len(formatted_lst) == 2:
-            print('nothing')
             get_error_state = create_new_photo(
                 user_data=formatted_lst[0],
                 img_font=int(formatted_lst[1]),

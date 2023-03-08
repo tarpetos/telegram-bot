@@ -1,14 +1,9 @@
-import mysql
-import mysql.connector
+from bot.bot_main.bot_classes.ConnectionDB import ConnectionDB
 
-class StatisticsTable:
+
+class StatisticsTable(ConnectionDB):
     def __init__(self):
-        self.con = mysql.connector.connect(
-            host='localhost',
-            user='root',
-            passwd='1111',
-            database='bot_db'
-        )
+        super().__init__()
         self.cur = self.con.cursor()
         self.create_table()
 

@@ -29,8 +29,6 @@ async def get_photo_config(message: types.Message):
 
 @dp.message_handler(state=PhotoInscription.user_incription_config, content_types=ContentType.PHOTO)
 async def create_photo(message: types.Message, state: FSMContext):
-    # await delete_messages(message, user_message, bot_message)
-
     photo = message.photo[-1]
     await photo.download(destination_file='imgs/test.jpg')
 
@@ -47,7 +45,6 @@ async def create_photo(message: types.Message, state: FSMContext):
         if create_photo_using_args:
             result_photo = InputFile('imgs/result.jpg')
             txt_data = get_data_from_txt()
-            print(txt_data)
             await bot.send_photo(
                 message.chat.id,
                 photo=result_photo, caption=f'{txt_data}', parse_mode='HTML'
