@@ -1,4 +1,4 @@
-API_TOKEN = '5063348094:AAFQCdPM_0UdIo9lmisS-1FIoJAaSpuZO-w'
+API_TOKEN = ''  # add your Telegram BOT API into quotes
 
 UA_COMMAND_DESC_LIST = '''
 /start - перевірка роботи бота
