@@ -18,7 +18,6 @@ def default_length_keyboard():
 @dp.callback_query_handler(text=['very_easy'])
 async def option_very_easy(call: types.CallbackQuery):
     result = await update_with_length_state(call)
-    print(result)
 
     if result is None:
         pass
@@ -44,7 +43,6 @@ async def option_very_easy(call: types.CallbackQuery):
 @dp.callback_query_handler(text=['easy'])
 async def option_easy(call: types.CallbackQuery):
     result = await update_with_length_state(call)
-    print(result)
 
     if result is None:
         pass
@@ -70,7 +68,6 @@ async def option_easy(call: types.CallbackQuery):
 @dp.callback_query_handler(text=['normal'])
 async def option_normal(call: types.CallbackQuery):
     result = await update_with_length_state(call)
-    print(result)
 
     if result is None:
         pass
@@ -96,7 +93,6 @@ async def option_normal(call: types.CallbackQuery):
 @dp.callback_query_handler(text=['hard'])
 async def option_hard(call: types.CallbackQuery):
     result = await update_with_length_state(call)
-    print(result)
 
     if result is None:
         pass
@@ -122,7 +118,6 @@ async def option_hard(call: types.CallbackQuery):
 @dp.callback_query_handler(text=['very_hard'])
 async def option_very_hard(call: types.CallbackQuery):
     result = await update_with_length_state(call)
-    print(result)
 
     if result is None:
         pass
@@ -148,7 +143,6 @@ async def option_very_hard(call: types.CallbackQuery):
 @dp.callback_query_handler(text=['unbreakable'])
 async def option_unbreakable(call: types.CallbackQuery):
     result = await update_with_length_state(call)
-    print(result)
 
     if result is None:
         pass

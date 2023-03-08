@@ -1,14 +1,6 @@
 import base64
 
 
-# def encrypt(data) -> bytes:
-#     return base64.b85encode(data.encode('UTF-16'))
-#
-#
-# def decrypt(data) -> str:
-#     return base64.b85decode(data).decode('UTF-16')
-
-
 def encrypt(data) -> str:
     encode = base64.b85encode(data.encode('UTF-16'))
     sub_start_symbols = (encode.decode()).split('|N', 1)[1] # -> into database

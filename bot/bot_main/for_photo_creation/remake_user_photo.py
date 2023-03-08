@@ -73,7 +73,6 @@ def create_new_photo_auto_config(clr_choice: bool, user_data=' '):
         font_size = int(IMAGE_WIDTH * 0.03)
         wrap_width = int(font_size * 0.8)
 
-    print('Image size:', IMAGE_WIDTH, IMAGE_HEIGHT)
     text_wrap = textwrap.wrap(user_data, width=wrap_width)
     font = ImageFont.truetype('fonts/AdverGothicC.ttf', font_size)
 
@@ -131,8 +130,6 @@ def get_image_general_color(image: Image, width, height) -> tuple:
 
     color_number = len(colors) * 2
     result_color = sum_red // color_number, sum_green // color_number, sum_blue // color_number
-    print('General:', result_color)
-    print('Color number:', color_number)
 
     return result_color
 
@@ -142,7 +139,6 @@ def visible_color(background: tuple) -> tuple:
     blue_clr = 255 - background[2]
     opposite_bg_color = red_clr, green_clr, blue_clr
 
-    print('Opposite:', opposite_bg_color)
     return opposite_bg_color
 
 

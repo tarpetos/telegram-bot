@@ -23,7 +23,6 @@ async def user_data(message: types.Message):
 
             all_tokens = token_table.select_all_tokens()
             user_token = token_table.select_token(user_id)
-            print(user_token)
 
             get_username = check_for_username(get_username)
 

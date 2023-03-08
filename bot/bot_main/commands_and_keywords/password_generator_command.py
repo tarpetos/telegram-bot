@@ -280,7 +280,6 @@ async def generate_password(call: types.CallbackQuery):
     storage = dp.current_state(chat=call.message.chat.id, user=call.from_user.id)
     data = await storage.get_data()
     necessary_keys = ['bot_message_id', 'password_contains', 'password_length']
-    print(data)
     user_alphabet = data.get('password_contains')
     user_length = data.get('password_length')
 
@@ -312,7 +311,6 @@ async def option_set_description(call: types.CallbackQuery):
     storage = dp.current_state(chat=call.message.chat.id, user=call.from_user.id)
     data = await storage.get_data()
     necessary_keys = ['bot_message_id', 'password_contains', 'password_length', 'generated_pasword']
-    print(data)
 
     if all(key in data for key in necessary_keys):
         await PasswordGeneratorStates.set_description.set()
@@ -332,7 +330,6 @@ async def process_description(message: types.Message, state: FSMContext):
     data.update({'description': f'{user_desc}'})
     await storage.set_data(data)
     message_id = data['bot_message_id']
-    print(data)
 
     if 'generated_pasword' in data:
         try:
@@ -404,7 +401,6 @@ async def next_to_second(call: CallbackQuery):
     storage = dp.current_state(chat=call.message.chat.id, user=call.from_user.id)
     data = await storage.get_data()
     necessary_keys = ['bot_message_id', 'password_contains']
-    print(data)
 
     if 'password_length' not in data:
         if all(key in data for key in necessary_keys):
@@ -431,7 +427,6 @@ async def next_to_third(call: CallbackQuery):
     storage = dp.current_state(chat=call.message.chat.id, user=call.from_user.id)
     data = await storage.get_data()
     necessary_keys = ['bot_message_id', 'password_contains', 'password_length']
-    print(data)
 
     if 'generated_pasword' in data:
         if data['description']:
@@ -480,7 +475,6 @@ async def main_generator_menu(call: CallbackQuery):
 async def back_to_first(call: CallbackQuery):
     storage = dp.current_state(chat=call.message.chat.id, user=call.from_user.id)
     data = await storage.get_data()
-    print(data)
 
     message_text = '<b><i>Choose what your password can contain:</i></b>'
 
@@ -493,7 +487,6 @@ async def back_to_second(call: CallbackQuery):
     storage = dp.current_state(chat=call.message.chat.id, user=call.from_user.id)
     data = await storage.get_data()
     user_choice = data.get('password_length')
-    print(user_choice)
 
     message_text = '<b><i>Choose the password difficulty:</i></b>\n\n'
 

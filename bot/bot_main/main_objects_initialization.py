@@ -13,7 +13,7 @@ storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
 store_users_data = UsersDataStore()
+statistics_table = StatisticsTable()
 unique_table = UniqueTablesForUsers()
 sticker_table = StickerTable()
-statistics_table = StatisticsTable()
 token_table = UserToken()

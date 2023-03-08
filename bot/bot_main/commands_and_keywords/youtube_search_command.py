@@ -16,7 +16,6 @@ async def parse_links(message: types.Message):
 async def process_links(message: types.Message, state: FSMContext):
     input_data = message.text
 
-    print('Video search query:', input_data)
     answer = parse_link.links_split(input_data)
 
     result = ''

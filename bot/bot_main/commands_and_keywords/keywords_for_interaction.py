@@ -81,7 +81,6 @@ async def help_with_photo(message: types.Message):
 @dp.message_handler(state=UserSticker.user_sticker, content_types=ContentType.STICKER)
 async def create_photo(message: types.Message, state: FSMContext):
     sended_user_sticker = message.sticker.file_id
-    print(sended_user_sticker)
     sticker_table.insert_into_sticker_table(sended_user_sticker)
     await message.reply(f'Your sticker was added successfully!')
     await state.finish()
@@ -192,23 +191,11 @@ async def find_date_after_days(message: types.Message):
 @dp.message_handler(content_types=ContentType.ANY)
 async def check_bot_usage(message: types.Message):
     chat_id = message.chat.id
-    print(chat_id)
     bot_id = message.bot.id
     user_id = message.from_id
     username = message.from_user.username
     full_name = message.from_user.full_name
     message_id = message.message_id
-
-    # print('Message chat id:', chat_id)
-    # print('Bot id:', bot_id)
-    # print('From what id message:', user_id)
-    # print('From what username:', username)
-    # print('From user full name:', full_name)
-    # print('Message id:', message_id)
-    # print('Message text:', message.text)
-    # print('Message type:', message.content_type)
-    # print('Chat type:', message.chat.type)
-    # print('Message caption', message.caption, '\n')
 
     if username is None:
         username = ' '

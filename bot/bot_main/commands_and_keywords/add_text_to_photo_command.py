@@ -45,7 +45,6 @@ async def create_photo(message: types.Message, state: FSMContext):
         if create_photo_using_args:
             result_photo = InputFile('imgs/result.jpg')
             txt_data = get_data_from_txt()
-            print(txt_data)
             await bot.send_photo(
                 message.chat.id,
                 photo=result_photo, caption=f'{txt_data}', parse_mode='HTML'
