@@ -15,7 +15,7 @@ class UniqueTablesForUsers(ConnectionDB):
                 BEGIN
                     DECLARE date_now DATE;
                     SET date_now = CURDATE();
-    
+
                     INSERT IGNORE INTO statistics(usage_date, user_id)
                     VALUES (date_now, get_user_id);
                 END
@@ -81,10 +81,10 @@ class UniqueTablesForUsers(ConnectionDB):
                 BEGIN
                     DECLARE date_now DATE;
                     DECLARE get_user_id INT;
-    
+
                     SET date_now = CURDATE();
                     SET get_user_id = %s;
-    
+
                     UPDATE statistics
                     SET task_sched_delete_num = task_sched_delete_num + 1
                     WHERE usage_date = date_now AND user_id = get_user_id;
@@ -103,10 +103,10 @@ class UniqueTablesForUsers(ConnectionDB):
                 BEGIN
                     DECLARE date_now DATE;
                     DECLARE get_user_id INT;
-    
+
                     SET date_now = CURDATE();
                     SET get_user_id = %s;
-    
+
                     UPDATE statistics
                     SET task_sched_update_num = task_sched_update_num + 1
                     WHERE usage_date = date_now AND user_id = get_user_id;
@@ -125,10 +125,10 @@ class UniqueTablesForUsers(ConnectionDB):
                 BEGIN
                     DECLARE date_now DATE;
                     DECLARE get_user_id INT;
-    
+
                     SET date_now = CURDATE();
                     SET get_user_id = %s;
-    
+
                     UPDATE statistics
                     SET task_sched_insert_num = task_sched_insert_num + 1
                     WHERE usage_date = date_now AND user_id = get_user_id;
@@ -235,10 +235,10 @@ class UniqueTablesForUsers(ConnectionDB):
                 BEGIN
                     DECLARE date_now DATE;
                     DECLARE get_user_id INT;
-    
+
                     SET date_now = CURDATE();
                     SET get_user_id = %s;
-    
+
                     UPDATE statistics
                     SET pass_gen_delete_num = pass_gen_delete_num + 1
                     WHERE usage_date = date_now AND user_id = get_user_id;
@@ -256,10 +256,10 @@ class UniqueTablesForUsers(ConnectionDB):
                 BEGIN
                     DECLARE date_now DATE;
                     DECLARE get_user_id INT;
-    
+
                     SET date_now = CURDATE();
                     SET get_user_id = %s;
-    
+
                     UPDATE statistics
                     SET pass_gen_update_num = pass_gen_update_num + 1
                     WHERE usage_date = date_now AND user_id = get_user_id;
@@ -277,10 +277,10 @@ class UniqueTablesForUsers(ConnectionDB):
                 BEGIN
                     DECLARE date_now DATE;
                     DECLARE get_user_id INT;
-    
+
                     SET date_now = CURDATE();
                     SET get_user_id = %s;
-    
+
                     UPDATE statistics
                     SET pass_gen_insert_num = pass_gen_insert_num + 1
                     WHERE usage_date = date_now AND user_id = get_user_id;
@@ -386,7 +386,7 @@ class UniqueTablesForUsers(ConnectionDB):
         self.con.commit()
 
     def insert_password_data(
-        self, user_id, user_desc, generated_pass, password_length, has_repetetive
+            self, user_id, user_desc, generated_pass, password_length, has_repetetive
     ):
         self.create_pass_gen_table(user_id)
 
@@ -415,7 +415,4 @@ class UniqueTablesForUsers(ConnectionDB):
         all_tables_lst = [table_tuple[0] for table_tuple in all_tables_tuple_lst]
 
         table_name = f"'pass_gen_table_{user_id}'"
-        if table_name in all_tables_lst:
-            return True
-        else:
-            return False
+        return table_name in all_tables_lst

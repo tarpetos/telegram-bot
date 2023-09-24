@@ -1,12 +1,12 @@
 from string import digits, ascii_letters
 
 from bot.bot_main.for_password_generation.generate_password import (
-    exclude_invalid_symblols_for_markup,
+    exclude_invalid_symbols_for_markup,
 )
 
 
 def keyboard_content_choice(user_choice) -> str:
-    allowed_punctuation = exclude_invalid_symblols_for_markup()
+    allowed_punctuation = exclude_invalid_symbols_for_markup()
     if user_choice == "all_characters":
         return digits + ascii_letters + allowed_punctuation
     elif user_choice == "only_letters":
