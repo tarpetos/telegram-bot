@@ -7,11 +7,12 @@ from PIL import Image, ImageFont, ImageDraw
 from bot.bot_main.for_photo_creation.photo_size import write_to_txt
 
 
-def create_new_photo(user_data=' ', pos_x=0, pos_y=0, img_width=0, img_height=0, img_font=20):
+def create_new_photo(
+    user_data=" ", pos_x=0, pos_y=0, img_width=0, img_height=0, img_font=20
+):
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-    warnings.filterwarnings('ignore', category=DeprecationWarning)
-
-    used_image = Image.open('imgs/test.jpg')
+    used_image = Image.open("imgs/test.jpg")
 
     if img_width == 0 and img_height == 0:
         width, height = used_image.size
@@ -29,18 +30,18 @@ def create_new_photo(user_data=' ', pos_x=0, pos_y=0, img_width=0, img_height=0,
         return True
 
     draw = ImageDraw.Draw(used_image)
-    font = ImageFont.truetype('fonts/AdverGothicC.ttf', font_size)
+    font = ImageFont.truetype("fonts/AdverGothicC.ttf", font_size)
 
     dominant_color = get_image_general_color(used_image, IMAGE_WIDTH, IMAGE_HEIGHT)
     font_color = visible_color(dominant_color)
 
     lines = []
-    line = ''
-    line_height = font.getsize('A')[1]
+    line = ""
+    line_height = font.getsize("A")[1]
 
-    for word in user_data.split(' '):
-        if draw.textsize(line + ' ' + word, font=font)[0] <= IMAGE_WIDTH - pos_x:
-            line += ' ' + word
+    for word in user_data.split(" "):
+        if draw.textsize(line + " " + word, font=font)[0] <= IMAGE_WIDTH - pos_x:
+            line += " " + word
         else:
             lines.append(line.strip())
             line = word
@@ -52,13 +53,13 @@ def create_new_photo(user_data=' ', pos_x=0, pos_y=0, img_width=0, img_height=0,
         draw.text((pos_x, pos_y), line, fill=font_color, font=font)
         pos_y += line_height + (font_size * 0.2)
 
-    used_image.save('imgs/result.jpg')
+    used_image.save("imgs/result.jpg")
 
 
-def create_new_photo_auto_config(clr_choice: bool, user_data=' '):
-    warnings.filterwarnings('ignore', category=DeprecationWarning)
+def create_new_photo_auto_config(clr_choice: bool, user_data=" "):
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-    used_image = Image.open('imgs/test_auto_conf.jpg')
+    used_image = Image.open("imgs/test_auto_conf.jpg")
     IMAGE_WIDTH, IMAGE_HEIGHT = used_image.size
 
     draw = ImageDraw.Draw(used_image)
@@ -74,7 +75,7 @@ def create_new_photo_auto_config(clr_choice: bool, user_data=' '):
         wrap_width = int(font_size * 0.8)
 
     text_wrap = textwrap.wrap(user_data, width=wrap_width)
-    font = ImageFont.truetype('fonts/AdverGothicC.ttf', font_size)
+    font = ImageFont.truetype("fonts/AdverGothicC.ttf", font_size)
 
     current_height, padding = IMAGE_HEIGHT - font_size, 10
 
@@ -90,11 +91,11 @@ def create_new_photo_auto_config(clr_choice: bool, user_data=' '):
             ((IMAGE_WIDTH - text_width) / 2, current_height),
             new_line,
             font=font,
-            fill=font_color
+            fill=font_color,
         )
         current_height -= text_height + padding
 
-    used_image.save('imgs/result_auto_conf.jpg')
+    used_image.save("imgs/result_auto_conf.jpg")
 
 
 def change_size_statement(new_width: int, new_height: int, image: Image) -> Image:
@@ -129,9 +130,14 @@ def get_image_general_color(image: Image, width, height) -> tuple:
         sum_blue += int(color[1][2] * color_coeff)
 
     color_number = len(colors) * 2
-    result_color = sum_red // color_number, sum_green // color_number, sum_blue // color_number
+    result_color = (
+        sum_red // color_number,
+        sum_green // color_number,
+        sum_blue // color_number,
+    )
 
     return result_color
+
 
 def visible_color(background: tuple) -> tuple:
     red_clr = 255 - background[0]
@@ -143,7 +149,9 @@ def visible_color(background: tuple) -> tuple:
 
 
 def change_color(background: tuple) -> tuple:
-    brightness = (background[0] * 299 + background[1] * 587 + background[2] * 114) // 1000
+    brightness = (
+        background[0] * 299 + background[1] * 587 + background[2] * 114
+    ) // 1000
 
     if brightness < 128:
         rand_col_1 = random.randint(128, 255)
@@ -155,4 +163,3 @@ def change_color(background: tuple) -> tuple:
         rand_col_3 = random.randint(0, 127)
 
     return rand_col_1, rand_col_2, rand_col_3
-

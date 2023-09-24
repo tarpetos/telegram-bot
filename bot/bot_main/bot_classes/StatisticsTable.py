@@ -4,13 +4,11 @@ from bot.bot_main.bot_classes.ConnectionDB import ConnectionDB
 class StatisticsTable(ConnectionDB):
     def __init__(self):
         super().__init__()
-        self.cur = self.con.cursor()
         self.create_table()
-
 
     def create_table(self):
         self.cur.execute(
-            '''
+            """
             CREATE TABLE IF NOT EXISTS statistics (
                 id INT PRIMARY KEY AUTO_INCREMENT,
                 usage_date DATE NOT NULL,
@@ -24,5 +22,5 @@ class StatisticsTable(ConnectionDB):
                 CONSTRAINT unique_date_id UNIQUE (usage_date, user_id),
                 FOREIGN KEY (user_id) REFERENCES users_info(user_id) ON DELETE CASCADE ON UPDATE CASCADE
             )
-            '''
+            """
         )

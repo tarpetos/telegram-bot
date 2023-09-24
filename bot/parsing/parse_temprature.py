@@ -5,28 +5,34 @@ from bs4 import BeautifulSoup as Bs
 
 def parse_temp_at_time(url: str) -> str:
     r = requests.get(url)
-    html = Bs(r.content, 'html.parser')
-    time = html.select('.imgBlock p')
-    temp_at_time = html.select('.today-temp')
+    html = Bs(r.content, "html.parser")
+    time = html.select(".imgBlock p")
+    temp_at_time = html.select(".today-temp")
 
-    return time[0].text + ': ' + temp_at_time[0].text
+    return time[0].text + ": " + temp_at_time[0].text
 
 
 def parse_minmax_temp(url: str) -> str:
     r = requests.get(url)
-    html = Bs(r.content, 'html.parser')
-    min_temp = html.select('.min span')
-    max_temp = html.select('.max span')
+    html = Bs(r.content, "html.parser")
+    min_temp = html.select(".min span")
+    max_temp = html.select(".max span")
 
-    return 'Min temprature: ' + min_temp[0].text + 'C\n' + \
-           'Max temprature: ' + max_temp[0].text + 'C\n'
+    return (
+        "Min temprature: "
+        + min_temp[0].text
+        + "C\n"
+        + "Max temprature: "
+        + max_temp[0].text
+        + "C\n"
+    )
 
 
 def parse_today_temp(url: str) -> list:
     r = requests.get(url)
-    html = Bs(r.content, 'html.parser')
+    html = Bs(r.content, "html.parser")
 
-    today_temp = html.select('.temperature td')
+    today_temp = html.select(".temperature td")
 
     new_list = []
     for td in today_temp:
@@ -37,20 +43,22 @@ def parse_today_temp(url: str) -> list:
 
 def list_of_tuples(url: str) -> list:
     initial_list = parse_today_temp(url)
-    new_list = [(initial_list[i - 1], initial_list[i]) for i in range(1, len(initial_list), 2)]
+    new_list = [
+        (initial_list[i - 1], initial_list[i]) for i in range(1, len(initial_list), 2)
+    ]
     return new_list
 
 
 def parse_avarage_precipitation_probability(url: str) -> int:
     r = requests.get(url)
-    html = Bs(r.content, 'html.parser')
+    html = Bs(r.content, "html.parser")
 
-    precipitation_probability = html.select('tr:nth-child(8) td')
+    precipitation_probability = html.select("tr:nth-child(8) td")
     count = 0
     temp = 0
     precipitation_probability_list = []
     for td in precipitation_probability:
-        if td.text == '-':
+        if td.text == "-":
             precipitation_probability_list.append(0)
             temp = temp
         else:
@@ -63,9 +71,9 @@ def parse_avarage_precipitation_probability(url: str) -> int:
 
 def check_for_negative_temp(temprature: float) -> str:
     if temprature > 0:
-        return '+' + str(temprature) + '°C'
+        return "+" + str(temprature) + "°C"
     else:
-        return str(temprature) + '°C'
+        return str(temprature) + "°C"
 
 
 def find_avarage_temp_between_two(url: str) -> list:
@@ -76,7 +84,7 @@ def find_avarage_temp_between_two(url: str) -> list:
         sum_of_two = 0
 
         for j in range(2):
-            result = int(re.search(r'-*\d+', i[j]).group())
+            result = int(re.search(r"-*\d+", i[j]).group())
             sum_of_two += result
 
         result_list.append(check_for_negative_temp(sum_of_two / 2))
@@ -88,7 +96,9 @@ def avarage_day_temp(url: str) -> str:
     avarage_temp = 0
     count = 0
     for i in parse_today_temp(url):
-        avarage_temp += int(re.search(r'-*\d+', i).group())
+        avarage_temp += int(re.search(r"-*\d+", i).group())
         count += 1
 
-    return 'Avarage temprature: ' + check_for_negative_temp(avarage_temp / count) + '\n\n'
+    return (
+        "Avarage temprature: " + check_for_negative_temp(avarage_temp / count) + "\n\n"
+    )

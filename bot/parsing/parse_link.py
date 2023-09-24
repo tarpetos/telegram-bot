@@ -2,7 +2,7 @@ from youtubesearchpython import VideosSearch
 
 
 def parse_link(i: int, serch_term: str) -> str:
-    videos_search = VideosSearch(f'{serch_term}', limit=i)
+    videos_search = VideosSearch(f"{serch_term}", limit=i)
     return str(videos_search.result())
 
 
