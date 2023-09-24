@@ -4,8 +4,12 @@ from bot.keyboards.password_generator.back_keyboard import back_button
 
 password_generator_update_keyboard = InlineKeyboardMarkup()
 
-change_description_button = InlineKeyboardButton(text='Change description', callback_data='change_description')
-create_password_button = InlineKeyboardButton(text='Change password', callback_data='change_password')
+change_description_button = InlineKeyboardButton(
+    text="Change description", callback_data="change_description"
+)
+create_password_button = InlineKeyboardButton(
+    text="Change password", callback_data="change_password"
+)
 
 password_generator_update_keyboard.add(change_description_button)
 password_generator_update_keyboard.insert(create_password_button)

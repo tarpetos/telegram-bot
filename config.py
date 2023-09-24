@@ -1,6 +1,6 @@
-API_TOKEN = ''  # add your Telegram BOT API into quotes
+API_TOKEN = ""  # add your Telegram BOT API into quotes
 
-UA_COMMAND_DESC_LIST = '''
+UA_COMMAND_DESC_LIST = """
 /start - перевірка роботи бота
 /random - генерація випадкового цілого числа
 /eugene - функція пошуку відео
@@ -15,9 +15,9 @@ UA_COMMAND_DESC_LIST = '''
 /password - генератор випадкових паролів
 /keywords - список ключових слів, на які реагує бот
 /help - список команд
-'''
+"""
 
-EN_COMMAND_DESC_LIST = '''
+EN_COMMAND_DESC_LIST = """
 /start - check if bot is working
 /random - generate random integer number
 /eugene - youtube video search
@@ -32,25 +32,25 @@ EN_COMMAND_DESC_LIST = '''
 /password - random password generator
 /keywords - list of keywords that the bot responds to
 /help - command list
-'''
+"""
 
 COMMAND_LIST = [
-    '/start',
-    '/random',
-    '/eugene',
-    '/id',
-    '/time',
-    '/sticker',
-    '/currency',
-    '/weather',
-    '/birthday',
-    '/taskscheduler',
-    '/photo',
-    '/password',
-    '/keywords',
-    '/help',
+    "/start",
+    "/random",
+    "/eugene",
+    "/id",
+    "/time",
+    "/sticker",
+    "/currency",
+    "/weather",
+    "/birthday",
+    "/taskscheduler",
+    "/photo",
+    "/password",
+    "/keywords",
+    "/help",
 ]
 
 # CURRENCY_URL = 'https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5'
-CURRENCY_URL = 'https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=11'
-BITCOIN_URL = 'https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT'
+CURRENCY_URL = "https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=11"
+BITCOIN_URL = "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT"

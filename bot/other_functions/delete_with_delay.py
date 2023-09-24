@@ -4,6 +4,7 @@ from bot.bot_main.main_objects_initialization import bot
 
 DELETE_TIMEOUT = 60
 
+
 async def delete_messages(message, bot_message):
     user_message = message.message_id
     await asyncio.sleep(DELETE_TIMEOUT)
