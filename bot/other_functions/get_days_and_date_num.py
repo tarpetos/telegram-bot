@@ -1,15 +1,16 @@
 import re
+from typing import Tuple, List
 
 
-def exctract_from_user_input_days_num(user_input):
+def extract_from_user_input_days_num(user_input: str) -> int:
     days_num_pattern = re.compile("[1-9]+[0-9]*")
 
     days_num = re.findall(days_num_pattern, user_input)
     return int(days_num[0])
 
 
-def exctract_from_user_input_days_and_date(user_input):
-    days_num = exctract_from_user_input_days_num(user_input)
+def extract_from_user_input_days_and_date(user_input: str) -> Tuple[int, List[int]]:
+    days_num = extract_from_user_input_days_num(user_input)
     date_pattern = re.compile(
         "([1-9]|0[1-9]|[1-2][0-9]|3[0-1]).([1-9]|0[1-9]|1[0-2]).([1-9]+.*[0-9]+)"
     )

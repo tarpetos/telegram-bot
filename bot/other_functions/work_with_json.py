@@ -1,6 +1,6 @@
 import os
 
-from bot.bot_main.main_objects_initialization import unique_table
+from bot.config import unique_table
 from bot.other_functions.write_password_data_to_json import write_to_json
 
 

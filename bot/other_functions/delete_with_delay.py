@@ -1,6 +1,6 @@
 import asyncio
 
-from bot.bot_main.main_objects_initialization import bot
+from bot.config import bot
 
 DELETE_TIMEOUT = 60
 

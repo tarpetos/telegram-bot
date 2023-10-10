@@ -5,7 +5,7 @@ from aiogram.types import ContentType, InputFile
 from bot.bot_main.bot_classes.PhotoInscription import PhotoInscription
 from bot.bot_main.for_photo_creation.photo_size import get_data_from_txt
 from bot.bot_main.for_photo_creation.validate_args_number import validate_args
-from bot.bot_main.main_objects_initialization import dp, bot
+from bot.config import dp, bot
 from bot.other_functions.delete_with_delay import delete_messages
 
 

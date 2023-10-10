@@ -3,7 +3,7 @@ from typing import Coroutine, Any, Dict
 from aiogram import types
 from aiogram.types import InlineKeyboardButton
 
-from bot.bot_main.main_objects_initialization import dp
+from bot.config import dp
 from bot.keyboards.password_generator.set_length_keyboard import (
     very_easy_button,
     easy_button,

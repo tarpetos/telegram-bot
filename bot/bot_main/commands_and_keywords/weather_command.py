@@ -3,7 +3,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 from bot.bot_main.bot_classes.WeatherInfo import WeatherInfo
-from bot.bot_main.main_objects_initialization import dp
+from bot.config import dp
 from bot.parsing.parse_temprature import (
     find_avarage_temp_between_two,
     parse_minmax_temp,

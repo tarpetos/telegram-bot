@@ -5,8 +5,8 @@ from bot.other_functions.get_id_and_convert import get_id_from_str
 class UniqueTablesForUsers(ConnectionDB):
     def __init__(self):
         super().__init__()
-        self.date_id_procedure()
-        self.month_avg_statistics_view()
+        # self.date_id_procedure()
+        # self.month_avg_statistics_view()
 
     def date_id_procedure(self):
         self.cur.execute(
@@ -154,10 +154,10 @@ class UniqueTablesForUsers(ConnectionDB):
     def delete_from_table(self, user_id, table_id):
         self.create_table(user_id)
 
-        converted_id = get_id_from_str(user_id)
-        trigger_name = f"delete_task_{converted_id}"
-        self.cur.execute("CALL add_date_and_id(%s)", (converted_id,))
-        self.trigger_on_delete_task(trigger_name, user_id, converted_id)
+        # converted_id = get_id_from_str(user_id)
+        # trigger_name = f"delete_task_{converted_id}"
+        # self.cur.execute("CALL add_date_and_id(%s)", (converted_id,))
+        # self.trigger_on_delete_task(trigger_name, user_id, converted_id)
 
         self.cur.execute(
             """
@@ -173,9 +173,9 @@ class UniqueTablesForUsers(ConnectionDB):
         self.create_table(user_id)
 
         converted_id = get_id_from_str(user_id)
-        trigger_name = f"change_task_{converted_id}"
-        self.cur.execute("CALL add_date_and_id(%s)", (converted_id,))
-        self.trigger_change_task(trigger_name, user_id, converted_id)
+        # trigger_name = f"change_task_{converted_id}"
+        # self.cur.execute("CALL add_date_and_id(%s)", (converted_id,))
+        # self.trigger_change_task(trigger_name, user_id, converted_id)
 
         self.cur.execute(
             """
@@ -192,9 +192,9 @@ class UniqueTablesForUsers(ConnectionDB):
         self.create_table(user_id)
 
         converted_id = get_id_from_str(user_id)
-        trigger_name = f"add_task_{converted_id}"
-        self.cur.execute("CALL add_date_and_id(%s)", (converted_id,))
-        self.trigger_add_task(trigger_name, user_id, converted_id)
+        # trigger_name = f"add_task_{converted_id}"
+        # self.cur.execute("CALL add_date_and_id(%s)", (converted_id,))
+        # self.trigger_add_task(trigger_name, user_id, converted_id)
 
         self.cur.execute(
             "INSERT IGNORE INTO `%s` (user_data) VALUES (%s)", (user_id, user_data)
@@ -333,9 +333,9 @@ class UniqueTablesForUsers(ConnectionDB):
         self.create_table(user_id)
 
         converted_id = get_id_from_str(user_id)
-        trigger_name = f"delete_password_{converted_id}"
-        self.cur.execute("CALL add_date_and_id(%s)", (converted_id,))
-        self.trigger_on_delete_password(trigger_name, user_id, converted_id)
+        # trigger_name = f"delete_password_{converted_id}"
+        # self.cur.execute("CALL add_date_and_id(%s)", (converted_id,))
+        # self.trigger_on_delete_password(trigger_name, user_id, converted_id)
 
         self.cur.execute(
             """
@@ -350,10 +350,10 @@ class UniqueTablesForUsers(ConnectionDB):
     def update_password_desc(self, user_id, user_desc, table_id):
         self.create_pass_gen_table(user_id)
 
-        converted_id = get_id_from_str(user_id)
-        trigger_name = f"change_password_{converted_id}"
-        self.cur.execute("CALL add_date_and_id(%s)", (converted_id,))
-        self.trigger_change_desc_password(trigger_name, user_id, converted_id)
+        # converted_id = get_id_from_str(user_id)
+        # trigger_name = f"change_password_{converted_id}"
+        # self.cur.execute("CALL add_date_and_id(%s)", (converted_id,))
+        # self.trigger_change_desc_password(trigger_name, user_id, converted_id)
 
         self.cur.execute(
             """
@@ -369,10 +369,10 @@ class UniqueTablesForUsers(ConnectionDB):
     def update_password(self, user_id, user_password, length, has_repetetive, table_id):
         self.create_pass_gen_table(user_id)
 
-        converted_id = get_id_from_str(user_id)
-        trigger_name = f"change_password_{converted_id}"
-        self.cur.execute("CALL add_date_and_id(%s)", (converted_id,))
-        self.trigger_change_desc_password(trigger_name, user_id, converted_id)
+        # converted_id = get_id_from_str(user_id)
+        # trigger_name = f"change_password_{converted_id}"
+        # self.cur.execute("CALL add_date_and_id(%s)", (converted_id,))
+        # self.trigger_change_desc_password(trigger_name, user_id, converted_id)
 
         self.cur.execute(
             """
@@ -386,14 +386,14 @@ class UniqueTablesForUsers(ConnectionDB):
         self.con.commit()
 
     def insert_password_data(
-            self, user_id, user_desc, generated_pass, password_length, has_repetetive
+        self, user_id, user_desc, generated_pass, password_length, has_repetetive
     ):
         self.create_pass_gen_table(user_id)
 
-        converted_id = get_id_from_str(user_id)
-        trigger_name = f"add_password_{converted_id}"
-        self.cur.execute("CALL add_date_and_id(%s)", (converted_id,))
-        self.trigger_add_password(trigger_name, user_id, converted_id)
+        # converted_id = get_id_from_str(user_id)
+        # trigger_name = f"add_password_{converted_id}"
+        # self.cur.execute("CALL add_date_and_id(%s)", (converted_id,))
+        # self.trigger_add_password(trigger_name, user_id, converted_id)
 
         self.cur.execute(
             """

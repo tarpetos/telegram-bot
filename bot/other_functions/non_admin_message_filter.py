@@ -1,4 +1,4 @@
-from bot.bot_main.main_objects_initialization import bot
+from bot.config import bot
 
 
 def get_admin_ids(administrators_list) -> list:

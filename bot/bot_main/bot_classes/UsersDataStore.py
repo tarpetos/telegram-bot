@@ -4,6 +4,7 @@ from bot.bot_main.bot_classes.ConnectionDB import ConnectionDB
 class UsersDataStore(ConnectionDB):
     def __init__(self):
         super().__init__()
+        self.create_table()
         self.update_start_date_after_month()
 
     def create_table(self):

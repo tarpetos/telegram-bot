@@ -5,7 +5,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 from bot.bot_main.bot_classes.DaysToBirthday import DaysToBirthday
-from bot.bot_main.main_objects_initialization import dp
+from bot.config import dp
 from bot.other_functions.check_date_words import check_year, check_month, check_day
 
 

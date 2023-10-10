@@ -16,11 +16,11 @@ from bot.bot_main.for_password_generation.password_content_callbacks import (
 from bot.bot_main.for_password_generation.password_length_callbacks_handler import (
     LengthController,
 )
-from bot.bot_main.main_objects_initialization import (
+from bot.config import (
     dp,
     bot,
     unique_table,
-    store_users_data,
+    # store_users_data,
 )
 from bot.keyboards.password_generator.back_keyboard import (
     back_to_telegram_generator_keyboard,
@@ -63,7 +63,7 @@ async def password(message: types.Message):
     user_id = message.from_id
     username = message.from_user.username
     full_name = message.from_user.full_name
-    store_users_data.connect_to_db(user_id, username, full_name, chat_id)
+    # store_users_data.connect_to_db(user_id, username, full_name, chat_id)
 
     await message.reply(
         "<b><i>Welcome to password generator</i></b> 🔒\n\n"
@@ -315,13 +315,13 @@ async def windows_installer(call: CallbackQuery):
 @dp.callback_query_handler(text=["linux_macos"])
 async def linux_macos(call: CallbackQuery):
     with open(
-        "password_generator_app/Password_Generator_Linux_MacOS.zip", "rb"
+        "password_generator_app/Password_Generator_v2_Linux.zip", "rb"
     ) as zip_archive:
         zip_content = zip_archive.read()
 
     sent_message = await call.bot.send_document(
         chat_id=call.message.chat.id,
-        document=("Password_Generator_Linux_MacOS.zip", zip_content),
+        document=("Password_Generator_v2_Linux.zip", zip_content),
         caption="Password for archive: <code>123454321</code>",
         parse_mode="HTML",
     )

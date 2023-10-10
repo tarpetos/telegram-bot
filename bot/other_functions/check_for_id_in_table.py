@@ -1,4 +1,4 @@
-from bot.bot_main.main_objects_initialization import unique_table
+from bot.config import unique_table
 
 
 def check_for_id(message):

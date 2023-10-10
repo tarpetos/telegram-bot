@@ -1,7 +1,7 @@
 from aiogram import types
 
-from bot.bot_main.main_objects_initialization import dp
-from config import EN_COMMAND_DESC_LIST
+from bot.config import dp
+from bot.config import EN_COMMAND_DESC_LIST
 
 
 @dp.message_handler(state="*", commands=["start"])

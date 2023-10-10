@@ -3,9 +3,8 @@ import mysql.connector
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-from bot.bot_main import main_objects_initialization
 from bot.bot_main.bot_classes.TaskScheduler import TaskScheduler
-from bot.bot_main.main_objects_initialization import dp
+from bot.config import dp
 from bot.keyboards.task_scheduler import back_to_planner_keyboard
 from bot.keyboards.task_scheduler.scheduler_keyboard import scheduler_keyboard
 from bot.other_functions import check_for_comma_and_dot, check_for_id_in_table
@@ -19,9 +18,9 @@ async def scheduler_call(message: types.Message):
     user_id = message.from_id
     username = message.from_user.username
     full_name = message.from_user.full_name
-    main_objects_initialization.store_users_data.connect_to_db(
-        user_id, username, full_name, chat_id
-    )
+    # main_objects_initialization.store_users_data.connect_to_db(
+    #     user_id, username, full_name, chat_id
+    # )
 
     await message.reply(
         "Choose a task scheduler function:", reply_markup=scheduler_keyboard

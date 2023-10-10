@@ -1,6 +1,6 @@
 from aiogram import types
 
-from bot.bot_main.main_objects_initialization import dp
+from bot.config import dp
 
 
 @dp.message_handler(state="*", commands=["keywords"])

@@ -1,4 +1,4 @@
-from bot.bot_main.main_objects_initialization import dp
+from bot.config import dp
 
 
 async def update_state(call):

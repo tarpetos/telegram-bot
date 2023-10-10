@@ -2,7 +2,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 from bot.bot_main.bot_classes.SearchTerm import SearchTerm
-from bot.bot_main.main_objects_initialization import dp
+from bot.config import dp
 from bot.parsing import parse_link
 
 

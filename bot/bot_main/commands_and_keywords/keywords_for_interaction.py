@@ -1,3 +1,4 @@
+import asyncio
 import re
 from datetime import datetime, timedelta
 
@@ -6,29 +7,64 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import IsReplyFilter
 from aiogram.types import ContentType, InputFile
 
-from bot.bot_main.bot_classes.UserSticker import UserSticker
 from bot.bot_main.for_photo_creation.remake_user_photo import (
     create_new_photo_auto_config,
 )
-from bot.other_functions import currency_cost as cc
-from bot.bot_main.main_objects_initialization import (
+from bot.config import (
     dp,
-    sticker_table,
     bot,
     unique_table,
-    store_users_data,
 )
+from bot.other_functions import currency_cost as cc
 from bot.other_functions.check_date_words import check_day
-from bot.other_functions.get_days_and_date_num import (
-    exctract_from_user_input_days_and_date,
-    exctract_from_user_input_days_num,
+from bot.other_functions.check_document_extension import (
+    file_option_selector,
+    parse_args,
+    get_conversion_path_name,
 )
-
-# from bot.other_functions.non_admin_message_filter import delete_non_admin_message, get_admin_ids
+from bot.other_functions.file_size_contoller import send_documents
+from bot.other_functions.get_days_and_date_num import (
+    extract_from_user_input_days_and_date,
+    extract_from_user_input_days_num,
+)
+from bot.other_functions.image_to_file_converter import (
+    ImageLoader,
+    PDFConverter,
+    DOCXConverter,
+)
+from bot.other_functions.morse_options import get_result
 from bot.other_functions.remove_start_keyword import (
     remove_mem_from_start,
     remove_rand_mem_from_start,
 )
+
+# from bot.other_functions.image_to_file_converter import ImageQualityReducer
+
+# reducer = ImageQualityReducer("test.jpg")
+# reducer.reduce(100, "jpg")
+
+
+
+# @dp.message_handler(IsReplyFilter(True), regexp="^audio$|^аудіо$", content_types=ContentType.AUDIO)
+# async def process_audio(message: types.Message):
+#     print(message.audio)
+#     if message.reply_to_message.audio:
+#         print(message.reply_to_message.audio)
+#     else:
+#         print("BEBRA")
+
+
+@dp.message_handler(regexp="^morsec|^морзек")
+async def morse_encryptor(message: types.Message):
+    main_regex_len = 6
+    user_input = message.text
+
+    if len(user_input) == main_regex_len:
+        return
+
+    fixed_input = user_input[main_regex_len:].strip()
+    result = get_result(fixed_input)
+    await message.reply(text=result, parse_mode="HTML")
 
 
 @dp.message_handler(regexp="^dtr delete tasks$|^дтр видали завдання$")
@@ -53,18 +89,18 @@ async def bot_location(message: types.Message):
 @dp.message_handler(regexp="^bitcoin$|^біткоін$|^біток$")
 async def bitcoin_price(message: types.Message):
     await message.reply(
-        f'<b>Bitcoin price right now:</b> <span class="tg-spoiler">{cc.bitcoin_price()} $</span>\n',
+        f'<b>Bitcoin price right now:</b> <span class="tg-spoiler">{cc.bitcoin_price():.2f} $</span>\n',
         parse_mode="HTML",
     )
 
 
-@dp.message_handler(regexp="^dtr sticker$|^дтр стікер$")
-async def handle_message(message: types.Message):
-    await UserSticker.user_sticker.set()
-    await message.reply(
-        "Send me a sticker and I will save it to database."
-        "Then you can use stickers by typing command /sticker."
-    )
+# @dp.message_handler(regexp="^dtr sticker$|^дтр стікер$")
+# async def handle_message(message: types.Message):
+#     await UserSticker.user_sticker.set()
+#     await message.reply(
+#         "Send me a sticker and I will save it to database."
+#         "Then you can use stickers by typing command /sticker."
+#     )
 
 
 @dp.message_handler(regexp="^dtr example$|^дтр приклад$")
@@ -89,12 +125,12 @@ async def help_with_photo(message: types.Message):
     )
 
 
-@dp.message_handler(state=UserSticker.user_sticker, content_types=ContentType.STICKER)
-async def create_photo(message: types.Message, state: FSMContext):
-    sended_user_sticker = message.sticker.file_id
-    sticker_table.insert_into_sticker_table(sended_user_sticker)
-    await message.reply(f"Your sticker was added successfully!")
-    await state.finish()
+# @dp.message_handler(state=UserSticker.user_sticker, content_types=ContentType.STICKER)
+# async def create_photo(message: types.Message, state: FSMContext):
+#     sended_user_sticker = message.sticker.file_id
+#     sticker_table.insert_into_sticker_table(sended_user_sticker)
+#     await message.reply(f"Your sticker was added successfully!")
+#     await state.finish()
 
 
 @dp.message_handler(regexp="^random mem|^рандом мем", content_types=ContentType.PHOTO)
@@ -123,14 +159,129 @@ async def send_auto_config_photo_with_text(message: types.Message):
     await bot.send_photo(message.chat.id, photo=result_photo)
 
 
+@dp.message_handler(
+    IsReplyFilter(True),
+    regexp=re.compile(
+        "^reduce\\s*([1-9][0-9]?|100)?$|^знизити\\s*([1-9][0-9]?|100)?$", re.IGNORECASE
+    ),
+)
+async def reduce_image(message: types.Message):
+    replied_message = message.reply_to_message.content_type
+    allowed_content = (ContentType.PHOTO, ContentType.DOCUMENT)
+
+    if replied_message not in allowed_content:
+        return None
+
+    print(message.reply_to_message)
+
+
+@dp.message_handler(content_types=[ContentType.PHOTO, ContentType.DOCUMENT])
+async def image_pdf_converter_filter(message: types.Message, state: FSMContext):
+    first_photo = file_option_selector(message)
+    if not first_photo:
+        return
+
+    await state.update_data(
+        photo_0=first_photo,
+        photo_counter=0,
+        allowed_message_id_list=[message.message_id],
+    )
+    await state.set_state("image_state")
+
+
+@dp.message_handler(
+    content_types=[ContentType.PHOTO, ContentType.DOCUMENT], state="image_state"
+)
+async def image_pdf_converter_helper(message: types.Message, state: FSMContext):
+    photo = file_option_selector(message)
+    print(photo)
+    if not photo:
+        await state.finish()
+        return
+
+    async with state.proxy() as data:
+        data["photo_counter"] += 1
+        photo_counter = data["photo_counter"]
+        data[f"photo_{photo_counter}"] = photo
+        data[f"allowed_message_id_list"].append(message.message_id)
+
+    if data["photo_counter"] > 20:
+        await state.finish()
+
+
+@dp.message_handler(
+    IsReplyFilter(True),
+    regexp=re.compile(
+        "^pdf\\s*([1-9][0-9]?|100)?$|^пдф\\s*([1-9][0-9]?|100)?$", re.IGNORECASE
+    ),
+    state="image_state",
+)
+async def image_pdf_converter_end_state_handler(
+        message: types.Message, state: FSMContext
+):
+    state_data = await state.get_data()
+    user_message_ids = state_data["allowed_message_id_list"]
+    check_message_id = message.reply_to_message.message_id
+    replied_message = message.reply_to_message.content_type
+    allowed_content = (ContentType.PHOTO, ContentType.DOCUMENT)
+
+    if replied_message in allowed_content and check_message_id in user_message_ids:
+        images_server_ids = [
+            state_data[key]["file_id"]
+            for key in state_data
+            if key.startswith("photo") and not isinstance(state_data[key], int)
+        ]
+        file_loader = ImageLoader(message, "images")
+        image_path_list = await file_loader.save_files(images_server_ids)
+
+        bot_message = await message.reply("PDF and DOCX conversion started...")
+
+        compression_level = parse_args(message, "pdf")
+        print(compression_level)
+        user_id = message.from_user.id
+        conversion_pdf_path = get_conversion_path_name(
+            "images", user_id, "pdf", filename="result"
+        )
+        pdf_converter = PDFConverter()
+        pdf_converter.convert(
+            conversion_pdf_path, image_path_list, compression_level=compression_level
+        )
+
+        conversion_docx_path = get_conversion_path_name(
+            "images", user_id, "docx", filename="result"
+        )
+        docx_converter = DOCXConverter()
+        docx_converter.convert(
+            conversion_docx_path, image_path_list, compression_level=compression_level
+        )
+
+        bot_message_data = await send_documents(
+            message, conversion_pdf_path, conversion_docx_path
+        )
+        await bot_message.edit_text(text=bot_message_data)
+
+        file_loader.remove_temp_dir()
+        await state.finish()
+
+
+@dp.message_handler(state="*", regexp="^clear states$|^очистити стани$")
+async def clear_states(message: types.Message, state: FSMContext):
+    bot_message = await message.reply("Clearing states...")
+    await asyncio.sleep(0.5)
+    await state.finish()
+    await bot.edit_message_text(
+        "States are cleared.",
+        chat_id=message.chat.id,
+        message_id=bot_message.message_id,
+    )
+
+
 @dp.message_handler(IsReplyFilter(True), regexp="^msgd$|пвдв$")
 async def delete_two_messages(message: types.Message):
     if message.reply_to_message.from_user.id == bot.id:
         replied_msg_id = message.reply_to_message.message_id
         await bot.delete_message(chat_id=message.chat.id, message_id=replied_msg_id)
         await message.delete()
-    else:
-        return
 
 
 @dp.message_handler(
@@ -142,7 +293,7 @@ async def delete_two_messages(message: types.Message):
 )
 async def find_date_after_days_from_current_date(message: types.Message):
     user_input = message.text
-    extracted_days = exctract_from_user_input_days_num(user_input)
+    extracted_days = extract_from_user_input_days_num(user_input)
 
     today = datetime.now()
     answer = today + timedelta(days=extracted_days)
@@ -150,6 +301,26 @@ async def find_date_after_days_from_current_date(message: types.Message):
 
     await message.reply(
         f"After {extracted_days} {check_day(extracted_days)} date will be {format_answer}!"
+    )
+
+
+@dp.message_handler(
+    regexp=re.compile(
+        "^(Яка дата|Який день) був [1-9]+[0-9]* (день|днів|дня) тому[?]*$|"
+        "^What (date|day) was (it)? [1-9]+[0-9]* (day|days) ago[?]*$",
+        re.IGNORECASE,
+    )
+)
+async def find_date_before_days_from_current_date(message: types.Message):
+    user_input = message.text
+    extracted_days = extract_from_user_input_days_num(user_input)
+
+    today = datetime.now()
+    answer = today - timedelta(days=extracted_days)
+    format_answer = answer.strftime("%d.%m.%Y")
+
+    await message.reply(
+        f"{extracted_days} {check_day(extracted_days)} ago it was {format_answer}!"
     )
 
 
@@ -164,7 +335,7 @@ async def find_date_after_days_from_current_date(message: types.Message):
 )
 async def find_date_after_days(message: types.Message):
     user_input = message.text
-    extracted_data = exctract_from_user_input_days_and_date(user_input)
+    extracted_data = extract_from_user_input_days_and_date(user_input)
     days_num = extracted_data[0]
     month_day = extracted_data[1][0]
     month = extracted_data[1][1]
@@ -187,31 +358,3 @@ async def find_date_after_days(message: types.Message):
             f"the month you entered does not contain such day of the month.",
             parse_mode="HTML",
         )
-
-
-# @dp.message_handler(content_types=ContentType.VOICE)
-# async def delete_voice_except_admins(message: types.Message):
-#     await delete_non_admin_message(message)
-
-
-# @dp.message_handler(content_types=ContentType.VIDEO_NOTE)
-# async def delete_video_note_except_admins(message: types.Message):
-#     await delete_non_admin_message(message)
-
-
-@dp.message_handler(content_types=ContentType.ANY)
-async def check_bot_usage(message: types.Message):
-    chat_id = message.chat.id
-    bot_id = message.bot.id
-    user_id = message.from_id
-    username = message.from_user.username
-    full_name = message.from_user.full_name
-    message_id = message.message_id
-
-    if username is None:
-        username = " "
-
-    if full_name is None:
-        full_name = " "
-
-    store_users_data.connect_to_db(user_id, username, full_name, chat_id)

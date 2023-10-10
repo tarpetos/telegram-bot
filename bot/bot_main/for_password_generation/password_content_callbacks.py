@@ -1,6 +1,6 @@
 from aiogram import types
 
-from bot.bot_main.main_objects_initialization import dp
+from bot.config import dp
 from bot.keyboards.password_generator.radio_keyboard import (
     first_generator_keyboard,
     all_button,
